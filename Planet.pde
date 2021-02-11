@@ -20,34 +20,35 @@ class Planet {
   }
 
   void update() {
-    //Newtonian Physics Calculation --
+    //Newtonian Physics Calculation -->
     vel.add(acc);
     pos.add(vel);
     acc.mult(0);
-    
+
     //Trail Variable Sampling -->
     if (pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5) {
-      if (vel.mag() > 20) {
-        trail.add(pos.copy());
-      } else if (vel.mag() < 20 && vel.mag() > 15) {
-        if (frameCount % 4 == 0) {
-          trail.add(pos.copy());
-        }
-      } else if (vel.mag() < 15 && vel.mag() > 10) {
-        if (frameCount % 6 == 0) {
-          trail.add(pos.copy());
-        }
-      } else if (vel.mag() < 10 && vel.mag() > 5) {
-        if (frameCount % 7 == 0) {
-          trail.add(pos.copy());
-        }
-      } else if (vel.mag() < 5) {
-        if (frameCount % 8 == 0) {
-          trail.add(pos.copy());
-        }
-      }
+      //if (vel.mag() > 20) {
+      //  trail.add(pos.copy());
+      //} else if (vel.mag() < 20 && vel.mag() > 15) {
+      //  if (frameCount % 4 == 0) {
+      //    trail.add(pos.copy());
+      //  }
+      //} else if (vel.mag() < 15 && vel.mag() > 10) {
+      //  if (frameCount % 6 == 0) {
+      //    trail.add(pos.copy());
+      //  }
+      //} else if (vel.mag() < 10 && vel.mag() > 5) {
+      //  if (frameCount % 7 == 0) {
+      //    trail.add(pos.copy());
+      //  }
+      //} else if (vel.mag() < 5) {
+      //  if (frameCount % 8 == 0) {
+      //    trail.add(pos.copy());
+      //  }
+      //}
+      trail.add(pos.copy());
     }
-    
+
     //Trail Cleanup -->
     if (trail.size() > 100) {
       trail.remove(0);
@@ -56,8 +57,6 @@ class Planet {
 
   void render() {
     //Planet -->
-    //stroke(128);
-    //strokeWeight(1);
     noStroke();
     fill(col);
     circle(pos.x, pos.y, DIAM_PLA);

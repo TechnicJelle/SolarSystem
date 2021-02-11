@@ -1,7 +1,3 @@
-import android.widget.Toast;
-import android.app.Activity;
-Activity act;
-
 PVector sun;
 
 ArrayList<Planet> planets;
@@ -14,31 +10,62 @@ final float DIAM_PLA = 32;
 final float DIAM_NPL = 64;
 
 float barHeight;
-final float barTouch = 48;
+final float barTouch = 16;
 color pCol;
 
 void setup() {
   fullScreen();
-  act = this.getActivity();
   sun = new PVector(width/2, height/2);
   planets = new ArrayList<Planet>();
-  showToast("Swipe to spawn a new planet!");
   barHeight = height - height/16;
-  pCol = color(255, 128, 0);
+  colorMode(HSB);
+  pCol = color(random(255), 255, 255);
+}
+
+boolean movingBar = false;
+
+float nPx, nPy;
+float nPvx, nPvy;
+void mousePressed() {
+  if (mouseY<barHeight) {
+    //Start Coordinates -->
+    nPx = mouseX;
+    nPy = mouseY;
+  } else if (mouseY > barHeight && mouseY < barHeight + barTouch) {
+    //Tap in bar
+    movingBar = true;
+  }
+}
+
+void mouseReleased() {
+  if (nPy<barHeight) {
+    //End Coordinates -->
+    nPvx = nPx - mouseX;
+    nPvy = nPy - mouseY;
+    //Add Planet -->
+    planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
+  }
+  //Reset to Prevent ToolBar Interference -->
+  nPy = height;
+  movingBar = false;
+  
+  //Make sure the bar doesn't become inaccessible
+  if(barHeight > height-barTouch) {
+    barHeight = height-barTouch;
+  }
 }
 
 void draw() {
-  background(10);
+  background(0, 0, 10);
 
   //Planets -->
   for (int i = planets.size() - 1; i >= 0; i--) {
     Planet p = planets.get(i);
-    if (!isTouching()) {
-      //p.applyForce(PVector.sub(sun, p.pos).mult(FAC_GRAV));
+    if (!mousePressed) {
       p.applyForce(attract(p));
       p.update();
     }
-    if (dist(p.pos.x, p.pos.y, sun.x, sun.y) < DIAM_SUN/2) {
+    if (dist(p.pos, sun) < DIAM_SUN/2) {
       planets.remove(i);
     }
     p.render();
@@ -51,7 +78,7 @@ void draw() {
   circle(sun.x, sun.y, DIAM_SUN);
 
   //Touch Actions -->
-  if (isTouching() && nPy < barHeight) {
+  if (mousePressed && nPy < barHeight) {
     //Catapult Graphic
     stroke(255);
     strokeWeight(4);
@@ -59,9 +86,9 @@ void draw() {
     noFill();
     circle(nPx, nPy, DIAM_NPL);
     line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
-  } else if (isTouching() && movingBar) {
+  } else if (mousePressed && movingBar) {
     barHeight = mouseY;
-  } else if (isTouching() && nPy > barHeight && mouseX < width/3) {
+  } else if (mousePressed && nPy > barHeight && mouseX < width/3) {
     //Colour Picker
     colorMode(HSB);
     pCol = color(map(mouseX, 0, width/3, 0, 255), 255, 255);
@@ -73,13 +100,13 @@ void draw() {
   } 
 
   //Colour Picker Render -->
-  final float colSegWidth = 10;
+  final float colSegWidth = width/3/128;
   strokeWeight(colSegWidth);
   strokeCap(SQUARE);
   colorMode(HSB);
   for (float i = 0; i < width/3; i+=colSegWidth) {
     stroke(map(i, 0, width/3, 0, 225), 255, 255, 200);
-    line(i, barHeight+1, i, height);
+    line(i + colSegWidth/2, barHeight+1, i + colSegWidth/2, height);
   }
   colorMode(RGB);
 
@@ -98,8 +125,6 @@ void draw() {
   }
   strokeCap(SQUARE);
   line(0, barHeight, width, barHeight);
-
-  fpsCount();
 }
 
 PVector attract(Planet p) {
@@ -112,79 +137,6 @@ PVector attract(Planet p) {
   return f;
 }
 
-boolean movingBar = false;
-
-float nPx, nPy;
-float nPvx, nPvy;
-void mousePressed() {
-  if (mouseY<barHeight) {
-    //Start Coordinates -->
-    nPx = mouseX;
-    nPy = mouseY;
-  } else if (mouseY > barHeight && mouseY < barHeight + barTouch) {
-    //Tap in bar
-    //pCol =color(156,255,255);
-    //showToast("!");
-    movingBar = true;
-  }
+float dist(PVector v1, PVector v2) {
+  return dist(v1.x, v1.y, v2.x, v2.y);
 }
-
-void mouseReleased() {
-  if (nPy<barHeight) {
-    //End Coordinates -->
-    nPvx = nPx - mouseX;
-    nPvy = nPy - mouseY;
-    //Add Planet -->
-    planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
-  }
-  //Reset to Prevent ToolBar Interference -->
-  nPy = height;
-  movingBar = false;
-}
-
-boolean isTouching() {
-  return touches.length > 0;
-}
-
-float txtSize = 64;
-void fpsCount() {
-  pushStyle();
-  String fps = str(round(frameRate));
-  noStroke();
-  fill(0);
-  rect(10, 10, 2* textWidth(fps), txtSize*0.8);
-  textSize(txtSize);
-  textAlign(LEFT, TOP);
-  fill(255, 255, 0);
-  text(fps, 10, 10);
-}
-
-void circle(float x, float y, float d) {
-  ellipse(x, y, d, d);
-}
-
-void showToast(final String message) {
-  runOnUiThread(new Runnable() {
-    public void run() {
-      android.widget.Toast.makeText(act.getApplicationContext(), message, android.widget.Toast.LENGTH_LONG).show();
-    }
-  }
-  );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

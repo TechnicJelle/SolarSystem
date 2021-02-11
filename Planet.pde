@@ -84,25 +84,3 @@ class Planet {
     text(vel.mag(), pos.x, pos.y + 32);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

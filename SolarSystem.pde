@@ -17,7 +17,7 @@ void setup() {
   fullScreen();
   sun = new PVector(width/2, height/2);
   planets = new ArrayList<Planet>();
-  barHeight = height - height/16;
+  barHeight = height - barTouch;
   colorMode(HSB);
   pCol = color(random(255), 255, 255);
 }
@@ -43,15 +43,18 @@ void mouseReleased() {
     nPvx = nPx - mouseX;
     nPvy = nPy - mouseY;
     //Add Planet -->
-    planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
+
+    if (dist(nPx, nPy, sun.x, sun.y) > DIAM_SUN/2) {
+      planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
+    }
   }
   //Reset to Prevent ToolBar Interference -->
   nPy = height;
   movingBar = false;
-  
+
   //Make sure the bar doesn't become inaccessible
-  if(barHeight > height-barTouch) {
-    barHeight = height-barTouch;
+  if (barHeight > height - barTouch) {
+    barHeight = height - barTouch;
   }
 }
 

@@ -16,6 +16,14 @@ float wd3;
 float colSegWidth;
 float wd3csw;
 
+//Settings -->
+boolean simRunning = true;
+boolean trackTrail = true;
+boolean showHeadingLine = false;
+boolean showVelocity = false;
+boolean showColourBar = true;
+boolean trackHQ = true;
+
 void setup() {
   fullScreen();
   colorMode(HSB);
@@ -48,6 +56,10 @@ void mouseReleased() {
     if (dist(nPx, nPy, sun.x, sun.y) > DIAM_SUN/2) { //Not in sun
       planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
     }
+
+    if (!simRunning) {
+      showHeadingLine = true;
+    }
   }
 }
 
@@ -57,7 +69,7 @@ void draw() {
   //Planets -->
   for (int i = planets.size() - 1; i >= 0; i--) {
     Planet p = planets.get(i);
-    if (!mousePressed) {
+    if (!mousePressed && simRunning) {
       if (dist(p.pos, sun) < DIAM_SUN/2)
         planets.remove(i);
 
@@ -82,7 +94,7 @@ void draw() {
       noFill();
       circle(nPx, nPy, DIAM_NPL);
       line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
-    } else if (nPy > barPos && mouseX < wd3csw) {
+    } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker
       pCol = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
       stroke(128);
@@ -93,11 +105,13 @@ void draw() {
   }
 
   //Colour Picker Render -->
-  strokeWeight(colSegWidth);
-  strokeCap(SQUARE);
-  for (float i = 0; i < wd3+1; i+=colSegWidth) {
-    stroke(map(i, 0, wd3, 0, 255), 255, 255, 200);
-    line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
+  if (showColourBar) {
+    strokeWeight(colSegWidth);
+    strokeCap(SQUARE);
+    for (float i = 0; i < wd3+1; i+=colSegWidth) {
+      stroke(map(i, 0, wd3, 0, 255), 255, 255, 200);
+      line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
+    }
   }
 }
 
@@ -108,6 +122,34 @@ PVector attract(Planet p) {
   float s = FAC_GRAV / (d*d);
   f.mult(s);
   return f;
+}
+
+void keyPressed() {
+  if (key == CODED) {
+    switch(keyCode) {
+    }
+  } else {
+    switch(key) {
+    case ' ':
+      simRunning = !simRunning;
+      break;
+    case 't':
+      trackTrail = !trackTrail;
+      break;
+    case 'h':
+      showHeadingLine = !showHeadingLine;
+      break;
+    case 'v':
+      showVelocity = !showVelocity;
+      break;
+    case 'c':
+      showColourBar = !showColourBar;
+      break;
+    case 'q':
+      trackHQ = !trackHQ;
+      break;
+    }
+  }
 }
 
 float dist(PVector v1, PVector v2) {

@@ -26,32 +26,37 @@ class Planet {
     acc.mult(0);
 
     //Trail Variable Sampling -->
-    if (pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5) {
-      //if (vel.mag() > 20) {
-      //  trail.add(pos.copy());
-      //} else if (vel.mag() < 20 && vel.mag() > 15) {
-      //  if (frameCount % 4 == 0) {
-      //    trail.add(pos.copy());
-      //  }
-      //} else if (vel.mag() < 15 && vel.mag() > 10) {
-      //  if (frameCount % 6 == 0) {
-      //    trail.add(pos.copy());
-      //  }
-      //} else if (vel.mag() < 10 && vel.mag() > 5) {
-      //  if (frameCount % 7 == 0) {
-      //    trail.add(pos.copy());
-      //  }
-      //} else if (vel.mag() < 5) {
-      //  if (frameCount % 8 == 0) {
-      //    trail.add(pos.copy());
-      //  }
-      //}
-      trail.add(pos.copy());
-    }
+    if (trackTrail) {
+      if (pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5) {
+        if (trackHQ) {
+          trail.add(pos.copy());
+        } else {
+          if (vel.mag() > 20) {
+            trail.add(pos.copy());
+          } else if (vel.mag() < 20 && vel.mag() > 15) {
+            if (frameCount % 4 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 15 && vel.mag() > 10) {
+            if (frameCount % 6 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 10 && vel.mag() > 5) {
+            if (frameCount % 7 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 5) {
+            if (frameCount % 8 == 0) {
+              trail.add(pos.copy());
+            }
+          }
+        }
+      }
 
-    //Trail Cleanup -->
-    if (trail.size() > 100) {
-      trail.remove(0);
+      //Trail Cleanup -->
+      if (trail.size() > 100) {
+        trail.remove(0);
+      }
     }
   }
 
@@ -62,24 +67,31 @@ class Planet {
     circle(pos.x, pos.y, DIAM_PLA);
 
     //Heading Vector Line -->
-    //strokeWeight(3);
-    //strokeCap(ROUND);
-    //line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
+    if (showHeadingLine) {
+      stroke(255);
+      strokeWeight(3);
+      strokeCap(ROUND);
+      line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
+    }
 
     //Trail -->
-    strokeCap(SQUARE);
-    for (int i = 1; i < trail.size(); i++) {
-      PVector pb = trail.get(i);
-      PVector pa = trail.get(i-1);
-      stroke(col, map(i, 0, trail.size(), 0, 255));
-      strokeWeight(map(i, 0, trail.size(), 0, 5));
-      line(pb.x, pb.y, pa.x, pa.y);
+    if (trackTrail) {
+      strokeCap(SQUARE);
+      for (int i = 1; i < trail.size(); i++) {
+        PVector pb = trail.get(i);
+        PVector pa = trail.get(i-1);
+        stroke(col, map(i, 0, trail.size(), 0, 255));
+        strokeWeight(map(i, 0, trail.size(), 0, 5));
+        line(pb.x, pb.y, pa.x, pa.y);
+      }
     }
 
     //Velocity Text -->
-    noStroke();
-    fill(255);
-    textSize(32);
-    text(vel.mag(), pos.x, pos.y + 32);
+    if (showVelocity) {
+      noStroke();
+      fill(255);
+      textSize(32);
+      text(vel.mag(), pos.x, pos.y + 32);
+    }
   }
 }

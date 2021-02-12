@@ -7,7 +7,7 @@ class Planet {
 
   color col = color(255, 128, 0);
 
-  boolean onScreen = false;
+  boolean onScreen = true;
 
   Planet(float x, float y, float vx, float vy, color c) {
     pos = new PVector(x, y);
@@ -68,6 +68,20 @@ class Planet {
   }
 
   void render() {
+    //Trail (Should always be rendered, even if planet is off screen) -->
+    if (trailTracking) {
+      strokeCap(SQUARE);
+      noFill();
+      beginShape();
+      for (int i = 0; i < trail.size(); i++) {
+        PVector pb = trail.get(i);
+        stroke(col, map(i, 0, trail.size(), 0, 255));
+        strokeWeight(map(i, 0, trail.size(), 0, 5));
+        curveVertex(pb.x, pb.y);
+      }
+      endShape();
+    }
+
     if (onScreen) {
       //Planet -->
       noStroke();
@@ -80,20 +94,6 @@ class Planet {
         strokeWeight(3);
         strokeCap(ROUND);
         line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
-      }
-
-      //Trail -->
-      if (trailTracking) {
-        strokeCap(SQUARE);
-        noFill();
-        beginShape();
-        for (int i = 0; i < trail.size(); i++) {
-          PVector pb = trail.get(i);
-          stroke(col, map(i, 0, trail.size(), 0, 255));
-          strokeWeight(map(i, 0, trail.size(), 0, 5));
-          curveVertex(pb.x, pb.y);
-        }
-        endShape();
       }
 
       //Velocity Text -->

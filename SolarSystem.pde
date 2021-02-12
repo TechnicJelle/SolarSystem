@@ -160,6 +160,13 @@ void keyPressed() {
     case 'q':
       trailHQ = !trailHQ;
       break;
+    case 'x':
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (!p.onScreen) {
+          planets.remove(i);
+        }
+      }
     }
   }
 }

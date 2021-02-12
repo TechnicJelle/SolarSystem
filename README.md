@@ -8,3 +8,4 @@ A simple solar system simulation environment where you can play around with plan
 `V` Turn Velocity Text On/**Off**\
 `C` Turn Colour Picker Bar **On**/Off\
 `Q` **High**/Low Quality Trails
+`X` Remove all offscreen Planets

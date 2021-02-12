@@ -11,4 +11,5 @@ A simple solar system simulation environment where you can play around with plan
 `C` Turn Colour Picker Bar **On**/Off\
 `Q` **High**/Low Quality Trails\
 `X` Remove all offscreen Planets\
-`S` Save Screenshot (will be saved in a screenshots folder next to the executable as *yyyyMMdd_hhmmss.png*)
+`S` Save Screenshot (will be saved in a screenshots folder next to the executable as *yyyyMMdd_hhmmss.png*)\
+`Esc` Close the program

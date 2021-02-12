@@ -25,7 +25,7 @@ boolean showColourBar = true;
 boolean trackHQ = true;
 
 void setup() {
-  fullScreen(P2D); //P2D is needed for the trails
+  fullScreen();
   colorMode(HSB);
   wd3 = width/3;
   colSegWidth = wd3/128;

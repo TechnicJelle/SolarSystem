@@ -25,8 +25,12 @@ boolean showHeadingLine = false;
 boolean showVelocity = false;
 boolean showColourBar = true;
 
-void setup() {
+void settings() {
   fullScreen(P2D); //P2D is needed for the trails
+  PJOGL.setIcon("icon.png");
+}
+
+void setup() {
   colorMode(HSB);
   wd3 = width/3;
   colSegWidth = wd3/128;

@@ -13,6 +13,9 @@ class Planet {
     acc = new PVector(0, 0);
     col = c;
     trail = new ArrayList<PVector>();
+    for (int i = 0; i < 100; i++) {
+      trail.add(pos.copy());
+    }
   }
 
   void applyForce(PVector f) {
@@ -54,7 +57,7 @@ class Planet {
       }
 
       //Trail Cleanup -->
-      if (trail.size() > 100) {
+      while (trail.size() > 100) {
         trail.remove(0);
       }
     }
@@ -76,14 +79,16 @@ class Planet {
 
     //Trail -->
     if (trackTrail) {
-      strokeCap(SQUARE);
-      for (int i = 1; i < trail.size(); i++) {
+      strokeCap(ROUND);
+      noFill();
+      beginShape();
+      for (int i = 0; i < trail.size(); i++) {
         PVector pb = trail.get(i);
-        PVector pa = trail.get(i-1);
         stroke(col, map(i, 0, trail.size(), 0, 255));
         strokeWeight(map(i, 0, trail.size(), 0, 5));
-        line(pb.x, pb.y, pa.x, pa.y);
+        curveVertex(pb.x, pb.y);
       }
+      endShape();
     }
 
     //Velocity Text -->

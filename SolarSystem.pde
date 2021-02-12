@@ -167,6 +167,10 @@ void keyPressed() {
           planets.remove(i);
         }
       }
+      break;
+    case 's':
+      saveFrame("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
+      break;
     }
   }
 }

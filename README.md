@@ -1,7 +1,9 @@
 # SolarSystem
 A simple solar system simulation environment where you can play around with planets, suns, gravity and orbits
 
-## ![Download here!](https://github.com/TechnicJelle/SolarSystem/releases)
+## ![Click here to download!](https://github.com/TechnicJelle/SolarSystem/releases)
+
+![GIF](https://github.com/TechnicJelle/SolarSystem/blob/main/.github/images/pc_anim.gif "GIF")
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\

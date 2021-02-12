@@ -1,7 +1,7 @@
 # SolarSystem
 A simple solar system simulation environment where you can play around with planets, suns, gravity and orbits
 
-## ![Click here to download!](https://github.com/TechnicJelle/SolarSystem/releases)
+## [Click here to download!](https://github.com/TechnicJelle/SolarSystem/releases)
 
 ![GIF](https://github.com/TechnicJelle/SolarSystem/blob/main/.github/images/pc_anim.gif "GIF")
 

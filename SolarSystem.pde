@@ -17,12 +17,13 @@ float colSegWidth;
 float wd3csw;
 
 //Settings -->
+int trailLength = 100;
+boolean trailTracking = true;
+boolean trailHQ = true;
 boolean simRunning = true;
-boolean trackTrail = true;
 boolean showHeadingLine = false;
 boolean showVelocity = false;
 boolean showColourBar = true;
-boolean trackHQ = true;
 
 void setup() {
   fullScreen(P2D); //P2D is needed for the trails
@@ -134,7 +135,7 @@ void keyPressed() {
       simRunning = !simRunning;
       break;
     case 't':
-      trackTrail = !trackTrail;
+      trailTracking = !trailTracking;
       break;
     case 'h':
       showHeadingLine = !showHeadingLine;
@@ -146,7 +147,7 @@ void keyPressed() {
       showColourBar = !showColourBar;
       break;
     case 'q':
-      trackHQ = !trackHQ;
+      trailHQ = !trailHQ;
       break;
     }
   }

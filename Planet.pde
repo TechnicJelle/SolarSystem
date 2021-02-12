@@ -13,7 +13,7 @@ class Planet {
     acc = new PVector(0, 0);
     col = c;
     trail = new ArrayList<PVector>();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < trailLength; i++) {
       trail.add(pos.copy());
     }
   }
@@ -29,9 +29,9 @@ class Planet {
     acc.mult(0);
 
     //Trail Variable Sampling -->
-    if (trackTrail) {
+    if (trailTracking) {
       if (pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5) {
-        if (trackHQ) {
+        if (trailHQ) {
           trail.add(pos.copy());
         } else {
           if (vel.mag() > 20) {
@@ -57,7 +57,7 @@ class Planet {
       }
 
       //Trail Cleanup -->
-      while (trail.size() > 100) {
+      while (trail.size() > trailLength) {
         trail.remove(0);
       }
     }
@@ -78,7 +78,7 @@ class Planet {
     }
 
     //Trail -->
-    if (trackTrail) {
+    if (trailTracking) {
       strokeCap(SQUARE);
       noFill();
       beginShape();

@@ -49,17 +49,26 @@ void mousePressed() {
 
 void mouseReleased() {
   if (nPy < barPos) {
-    //End Coordinates -->
-    nPvx = nPx - mouseX;
-    nPvy = nPy - mouseY;
+    if (mouseButton == LEFT) {
+      //End Coordinates -->
+      nPvx = nPx - mouseX;
+      nPvy = nPy - mouseY;
 
-    //Add Planet -->
-    if (dist(nPx, nPy, sun.x, sun.y) > DIAM_SUN/2) { //Not in sun
-      planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
-    }
+      //Add Planet -->
+      if (dist(nPx, nPy, sun.x, sun.y) > DIAM_SUN/2) { //Not in sun
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
+      }
 
-    if (!simRunning) {
-      showHeadingLine = true;
+      if (!simRunning) {
+        showHeadingLine = true; //Spawned a new planet while paused makes heading lines show
+      }
+    } else if (mouseButton == RIGHT) { //Right clicking a planet will remove it
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < DIAM_PLA/3) {
+          planets.remove(i);
+        }
+      }
     }
   }
 }
@@ -89,12 +98,14 @@ void draw() {
   if (mousePressed) {
     if (nPy < barPos) {
       //Catapult Graphic -->
-      stroke(255);
-      strokeWeight(4);
-      strokeCap(ROUND);
-      noFill();
-      circle(nPx, nPy, DIAM_NPL);
-      line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+      if (mouseButton == LEFT) {
+        stroke(255);
+        strokeWeight(4);
+        strokeCap(ROUND);
+        noFill();
+        circle(nPx, nPy, DIAM_NPL);
+        line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+      }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker
       pCol = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);

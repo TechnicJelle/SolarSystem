@@ -7,6 +7,8 @@ class Planet {
 
   color col = color(255, 128, 0);
 
+  boolean onScreen = false;
+
   Planet(float x, float y, float vx, float vy, color c) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
@@ -28,9 +30,11 @@ class Planet {
     pos.add(vel);
     acc.mult(0);
 
+    onScreen = pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5;
+
     //Trail Variable Sampling -->
     if (trailTracking) {
-      if (pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5) {
+      if (onScreen) {
         if (trailHQ) {
           trail.add(pos.copy());
         } else {
@@ -64,39 +68,41 @@ class Planet {
   }
 
   void render() {
-    //Planet -->
-    noStroke();
-    fill(col);
-    circle(pos.x, pos.y, DIAM_PLA);
-
-    //Heading Vector Line -->
-    if (showHeadingLine) {
-      stroke(255);
-      strokeWeight(3);
-      strokeCap(ROUND);
-      line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
-    }
-
-    //Trail -->
-    if (trailTracking) {
-      strokeCap(SQUARE);
-      noFill();
-      beginShape();
-      for (int i = 0; i < trail.size(); i++) {
-        PVector pb = trail.get(i);
-        stroke(col, map(i, 0, trail.size(), 0, 255));
-        strokeWeight(map(i, 0, trail.size(), 0, 5));
-        curveVertex(pb.x, pb.y);
-      }
-      endShape();
-    }
-
-    //Velocity Text -->
-    if (showVelocity) {
+    if (onScreen) {
+      //Planet -->
       noStroke();
-      fill(255);
-      textSize(32);
-      text(vel.mag(), pos.x, pos.y + 32);
+      fill(col);
+      circle(pos.x, pos.y, DIAM_PLA);
+
+      //Heading Vector Line -->
+      if (showHeadingLine) {
+        stroke(255);
+        strokeWeight(3);
+        strokeCap(ROUND);
+        line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
+      }
+
+      //Trail -->
+      if (trailTracking) {
+        strokeCap(SQUARE);
+        noFill();
+        beginShape();
+        for (int i = 0; i < trail.size(); i++) {
+          PVector pb = trail.get(i);
+          stroke(col, map(i, 0, trail.size(), 0, 255));
+          strokeWeight(map(i, 0, trail.size(), 0, 5));
+          curveVertex(pb.x, pb.y);
+        }
+        endShape();
+      }
+
+      //Velocity Text -->
+      if (showVelocity) {
+        noStroke();
+        fill(255);
+        textSize(32);
+        text(vel.mag(), pos.x, pos.y + 32);
+      }
     }
   }
 }

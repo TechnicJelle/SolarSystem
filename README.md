@@ -1,9 +1,9 @@
 # SolarSystem
 A simple solar system simulation environment where you can play around with planets, suns, gravity and orbits
 
-## [Click here to download!](https://github.com/TechnicJelle/SolarSystem/releases)
+## [Click here to download!](../../releases/latest)
 
-![GIF](https://github.com/TechnicJelle/SolarSystem/blob/main/.github/images/pc_anim.gif "GIF")
+![GIF](/.github/images/pc_anim.gif "GIF")
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
@@ -19,8 +19,8 @@ A simple solar system simulation environment where you can play around with plan
 `Esc` Close the program
 
 ## Screenshots
-![Default Settings](https://github.com/TechnicJelle/SolarSystem/blob/main/.github/images/pc_def.png "Default Settings")\
+![Default Settings](/.github/images/pc_def.png "Default Settings")\
 *Default Settings*
 
-![Heading, Velocity and Colour Picker Settings](https://github.com/TechnicJelle/SolarSystem/blob/main/.github/images/pc_settings.png "Heading, Velocity and Colour Picker Settings")\
+![Heading, Velocity and Colour Picker Settings](/.github/images/pc_settings.png "Heading, Velocity and Colour Picker Settings")\
 *Heading, Velocity and Colour Picker Settings*

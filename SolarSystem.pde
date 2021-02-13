@@ -30,11 +30,13 @@ PVector[] mouse = {new PVector(0, 0), new PVector(0, 1), new PVector(0.225, 0.83
 
 void settings() {
   fullScreen(P2D); //P2D is needed for the trails
+  smooth(2);
   PJOGL.setIcon("icon.png");
 }
 
 void setup() {
   colorMode(HSB);
+  hint(ENABLE_ASYNC_SAVEFRAME);
   noCursor();
   wd3 = width/3;
   colSegWidth = wd3/128;
@@ -202,6 +204,7 @@ void keyPressed() {
       }
       break;
     case 's':
+      save("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
       break;
     }
   }

@@ -5,12 +5,12 @@ ArrayList<Planet> planets;
 final float FAC_GRAV = 100000;
 final float FAC_NEWP = 0.1;
 
-final float DIAM_SUN = 128;
-final float DIAM_PLA = 32;
-final float DIAM_NPL = 64;
+final float SUN_RADIUS = 64;
+
+float newPlanetRadius;
+color newPlanetColour;
 
 float barPos;
-color pCol;
 
 float wd3;
 float colSegWidth;
@@ -40,7 +40,9 @@ void setup() {
   planets = new ArrayList<Planet>();
   float barHeight = 12;
   barPos = height - barHeight;
-  pCol = color(random(255), 255, 255);
+
+  newPlanetRadius = 16;
+  newPlanetColour = color(random(255), 255, 255);
 }
 
 float nPx, nPy;
@@ -54,24 +56,16 @@ void mousePressed() {
 void mouseReleased() {
   if (nPy < barPos) {
     if (mouseButton == LEFT) {
-      //End Coordinates -->
+      //Relative End Coordinates -->
       nPvx = nPx - mouseX;
       nPvy = nPy - mouseY;
-
       //Add Planet -->
-      if (dist(nPx, nPy, sun.x, sun.y) > DIAM_SUN/2) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, pCol));
+      if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
         showHeadingLine = true; //Spawned a new planet while paused makes heading lines show
-      }
-    } else if (mouseButton == RIGHT) { //Right clicking a planet will remove it
-      for (int i = planets.size() - 1; i >= 0; i--) {
-        Planet p = planets.get(i);
-        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < DIAM_PLA/3) {
-          planets.remove(i);
-        }
       }
     }
   }
@@ -84,7 +78,7 @@ void draw() {
   for (int i = planets.size() - 1; i >= 0; i--) {
     Planet p = planets.get(i);
     if (!mousePressed && simRunning) {
-      if (dist(p.pos, sun) < DIAM_SUN/2)
+      if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
         planets.remove(i);
 
       p.applyForce(attract(p));
@@ -96,26 +90,28 @@ void draw() {
   //Sun -->
   noStroke();
   fill(32, 255, 255);
-  circle(sun.x, sun.y, DIAM_SUN);
+  circle(sun.x, sun.y, SUN_RADIUS *2);
 
   //Mouse Actions -->
   if (mousePressed) {
     if (nPy < barPos) {
-      //Catapult Graphic -->
-      if (mouseButton == LEFT) {
-        stroke(255);
-        strokeWeight(4);
+      stroke(255);
+      strokeWeight(3);
+      noFill();
+      if (mouseButton == LEFT && dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Catapult Graphic
+        circle(nPx, nPy, newPlanetRadius *2);
         strokeCap(ROUND);
-        noFill();
-        circle(nPx, nPy, DIAM_NPL);
         line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+      } else if (mouseButton == RIGHT) { //Size Graphic
+        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), 8, SUN_RADIUS*2/3);
+        circle(nPx, nPy, newPlanetRadius *2);
       }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker
-      pCol = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
+      newPlanetColour = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
       stroke(128);
       strokeWeight(10);
-      fill(pCol);
+      fill(newPlanetColour);
       rect(mouseX, barPos - 32, width/10, -width/10, 20);
     }
   }
@@ -164,7 +160,15 @@ void keyPressed() {
     case 'q':
       trailHQ = !trailHQ;
       break;
-    case 'x':
+    case 'x': //remove a hovered over planet
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
+          planets.remove(i);
+        }
+      }
+      break;
+    case 'z': //remove offscreen planets
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (!p.onScreen) {

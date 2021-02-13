@@ -5,14 +5,16 @@ class Planet {
 
   ArrayList<PVector> trail;
 
+  float radius = 32;
   color col = color(255, 128, 0);
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, color c) {
+  Planet(float x, float y, float vx, float vy, float r, color c) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
     acc = new PVector(0, 0);
+    radius = r;
     col = c;
     trail = new ArrayList<PVector>();
     for (int i = 0; i < trailLength; i++) {
@@ -86,7 +88,7 @@ class Planet {
       //Planet -->
       noStroke();
       fill(col);
-      circle(pos.x, pos.y, DIAM_PLA);
+      circle(pos.x, pos.y, radius *2);
 
       //Heading Vector Line -->
       if (showHeadingLine) {

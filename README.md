@@ -24,8 +24,8 @@ A simple solar system simulation environment where you can play around with plan
 *Default Settings*
 
 
-![Now With Sizes!](/.github/images/pc_newsize.png "Now With Sizes")\
-*Now With Sizes*
+![Now with Sizes!](/.github/images/pc_newsize.png "Now with Sizes")\
+*Now with Sizes*
 
 ![Heading, Velocity and Colour Picker Settings](/.github/images/pc_settings.png "Heading, Velocity and Colour Picker Settings")\
 *Heading, Velocity and Colour Picker Settings*

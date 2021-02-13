@@ -25,6 +25,9 @@ boolean showHeadingLine = false;
 boolean showVelocity = false;
 boolean showColourBar = true;
 
+float mouseSize = 32;
+PVector[] mouse = {new PVector(0, 0), new PVector(0, 1), new PVector(0.225, 0.839711), new PVector(0.5, 0.866025)};
+
 void settings() {
   fullScreen(P2D); //P2D is needed for the trails
   PJOGL.setIcon("icon.png");
@@ -32,6 +35,7 @@ void settings() {
 
 void setup() {
   colorMode(HSB);
+  noCursor();
   wd3 = width/3;
   colSegWidth = wd3/128;
   wd3csw = wd3 + colSegWidth;
@@ -43,6 +47,9 @@ void setup() {
 
   newPlanetRadius = 16;
   newPlanetColour = color(random(255), 255, 255);
+
+  for (PVector p : mouse)
+    p.mult(mouseSize).add(new PVector(1, 3));
 }
 
 float nPx, nPy;
@@ -125,6 +132,24 @@ void draw() {
       line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
     }
   }
+
+  //Custom Cursor -->
+  pushMatrix();
+  translate(mouseX, mouseY);
+  noFill();
+  stroke(255, 128);
+  strokeWeight(3);
+  beginShape();
+  for (PVector p : mouse)
+    vertex(p.x, p.y);
+  endShape(CLOSE);
+  stroke(255, 200);
+  strokeWeight(1);
+  beginShape();
+  for (PVector p : mouse)
+    vertex(p.x, p.y);
+  endShape(CLOSE);
+  popMatrix();
 }
 
 PVector attract(Planet p) {
@@ -177,7 +202,6 @@ void keyPressed() {
       }
       break;
     case 's':
-      saveFrame("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
       break;
     }
   }

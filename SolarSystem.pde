@@ -8,6 +8,12 @@ final float FAC_NEWP = 0.1;
 final float SUN_RADIUS = 64;
 final float SUN_MASS = 500;
 
+final float MIN_PLANET_RADIUS = 8;
+final float MAX_PLANET_RADIUS = SUN_RADIUS * 2/3;
+
+final float MIN_PLANET_MASS = 10;
+final float MAX_PLANET_MASS = SUN_MASS * 2/3;
+
 final float TEXT_SIZE = 20;
 
 final int timeStepsPerFrame = 10;
@@ -102,6 +108,7 @@ void mouseWheel(MouseEvent event) {
   startMassChangeTime = millis();
   showingNewMass = true;
   float e = event.getCount();
+  newPlanetMass = (int)constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
 }
 
 void draw() {
@@ -157,6 +164,7 @@ void draw() {
       gizmos.noFill();
       switch(mouseButton) {
       case RIGHT: //Size Graphic
+        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
         gizmos.circle(nPx, nPy, newPlanetRadius *2);
         break;
       case LEFT: //Catapult Graphic

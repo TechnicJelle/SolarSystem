@@ -6,6 +6,7 @@ final float FAC_GRAV = 100000;
 final float FAC_NEWP = 0.1;
 
 final float SUN_RADIUS = 64;
+final float SUN_MASS = 500;
 
 final int timeStepsPerFrame = 10;
 
@@ -27,7 +28,7 @@ boolean trailTracking = true;
 boolean trailHQ = true;
 boolean simRunning = true;
 boolean showHeadingLine = false;
-boolean showVelocity = false;
+boolean showProperties = false;
 boolean showColourBar = true;
 
 float mouseSize = 32;
@@ -81,7 +82,7 @@ void mouseReleased() {
       nPvy = nPy - mouseY;
       //Add Planet -->
       if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetRadius, newPlanetColour));
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, random(30, 100), newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
@@ -104,7 +105,7 @@ void draw() {
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
           planets.remove(i);
 
-        p.applyForce(attract(p));
+        p.applyForce(attractMass(p));
         p.update(1/float(timeStepsPerFrame));
       }
     }
@@ -191,6 +192,13 @@ PVector attract(Planet p) {
   return f;
 }
 
+PVector attractMass(Planet p) {
+  float m = SUN_MASS * p.mass;
+  float rsq = sq(dist(sun, p.pos));
+  float q = m/rsq;
+  return PVector.sub(sun, p.pos).normalize().mult(q);
+}
+
 void keyPressed() {
   if (key == CODED) {
     switch(keyCode) {
@@ -206,8 +214,8 @@ void keyPressed() {
     case 'h':
       showHeadingLine = !showHeadingLine;
       break;
-    case 'v':
-      showVelocity = !showVelocity;
+    case 'p':
+      showProperties = !showProperties;
       break;
     case 'c':
       showColourBar = !showColourBar;

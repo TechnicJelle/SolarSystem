@@ -6,14 +6,16 @@ class Planet {
   ArrayList<PVector> trail;
 
   float radius = 32;
+  float mass = 50;
   color col = color(255, 128, 0);
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, float r, color c) {
+  Planet(float x, float y, float vx, float vy, float m, float r, color c) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
     acc = new PVector(0, 0);
+    mass = m;
     radius = r;
     col = c;
     trail = new ArrayList<PVector>();
@@ -67,11 +69,14 @@ class Planet {
       }
 
       //Velocity Text -->
-      if (showVelocity) {
+      if (showProperties) {
         gizmos.noStroke();
         gizmos.fill(255);
-        gizmos.textSize(24);
-        gizmos.text(vel.mag(), pos.x, pos.y + 32);
+        float textSize = 20;
+        gizmos.textSize(textSize);
+        gizmos.textAlign(LEFT, CENTER);
+        gizmos.textLeading(textSize);
+        gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1), pos.x, pos.y - radius);
       }
     }
   }

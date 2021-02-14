@@ -17,7 +17,7 @@ class Planet {
     acc = new PVector(0, 0);
     mass = m;
     radius = r;
-    col = color(hue, 255, 255);
+    col = colourFromMass(hue, mass);
     trail = new ArrayList<PVector>();
     for (int i = 0; i < trailLength; i++) {
       trail.add(pos.copy());
@@ -115,5 +115,9 @@ class Planet {
         trail.remove(0);
       }
     }
+  }
+
+  color colourFromMass(float hue, float mass) {
+    return color(hue, 255, 255);
   }
 }

@@ -231,6 +231,18 @@ void keyPressed() {
         }
       }
       break;
+    case 'd': //destroy planet creating multiple smaller ones
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
+          int pieces = (int)random(2, 6);
+          for (int j=0; j < pieces; j++) {
+            planets.add(new Planet(p.pos.x+random(-p.radius, p.radius), p.pos.y+random(-p.radius, p.radius), p.vel.x / FAC_NEWP, p.vel.y / FAC_NEWP, p.radius/pieces, p.col));
+          }
+          planets.remove(i);
+        }
+      }
+      break;
     case 's':
       system.save("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
       break;

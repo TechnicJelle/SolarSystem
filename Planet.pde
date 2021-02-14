@@ -45,8 +45,8 @@ class Planet {
       system.beginShape();
       for (int i = 0; i < trail.size(); i++) {
         PVector pb = trail.get(i);
-        system.stroke(col, map(i, 0, trail.size(), 0, 255));
-        system.strokeWeight(map(i, 0, trail.size(), 0, 5));
+        system.stroke(col, map(i, 0, trail.size(), 0, 200));
+        system.strokeWeight(map(i, 0, trail.size(), 0, radius /3));
         system.curveVertex(pb.x, pb.y);
       }
       system.endShape();

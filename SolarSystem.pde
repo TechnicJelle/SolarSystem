@@ -2,7 +2,7 @@ PVector sun;
 
 ArrayList<Planet> planets;
 
-final float FAC_GRAV = 100000;
+final float FAC_GRAV = 100;
 final float FAC_NEWP = 0.1;
 
 final float SUN_RADIUS = 64;
@@ -225,7 +225,7 @@ PVector attractMass(Planet p) {
   float m = SUN_MASS * p.mass;
   float rsq = sq(dist(sun, p.pos));
   float q = m/rsq;
-  return PVector.sub(sun, p.pos).normalize().mult(q);
+  return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
 }
 
 void keyPressed() {

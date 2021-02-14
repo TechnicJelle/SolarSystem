@@ -25,6 +25,7 @@ class Planet {
   }
 
   void applyForce(PVector f) {
+    f.div(mass); //Do take the mass into account in F = m * a  ==>  a = F / m
     acc.add(f);
   }
 

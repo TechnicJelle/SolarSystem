@@ -14,6 +14,7 @@ A simple solar system simulation environment where you can play around with plan
 `V` Turn Velocity Text On/**Off**\
 `C` Turn Colour Picker Bar **On**/Off\
 `Q` **High**/Low Quality Trails\
+`D` Destroy a Planet (Split it into multiple pieces)\
 `X` Remove a Planet (Hover over it with your cursor)\
 `Z` Remove all offscreen Planets\
 `S` Save Screenshot (will be saved in a screenshots folder next to the executable as *yyyyMMdd_hhmmss.png*)\

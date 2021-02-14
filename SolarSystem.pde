@@ -69,9 +69,11 @@ void mousePressed() {
   //Start Coordinates -->
   nPx = mouseX;
   nPy = mouseY;
+  simRunning = false;
 }
 
 void mouseReleased() {
+  simRunning = true;
   if (nPy < barPos) {
     if (mouseButton == LEFT) {
       //Relative End Coordinates -->

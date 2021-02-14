@@ -38,7 +38,8 @@ class Planet {
 
     //Trail (Should always be rendered, even if planet is off screen) -->
     if (trailTracking) {
-      trailUpdate();
+      if (simRunning)
+        trailUpdate();
       system.strokeCap(SQUARE);
       system.noFill();
       system.beginShape();

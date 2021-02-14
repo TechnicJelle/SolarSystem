@@ -7,6 +7,8 @@ final float FAC_NEWP = 0.1;
 
 final float SUN_RADIUS = 64;
 
+final int timeStepsPerFrame = 10;
+
 float newPlanetRadius;
 color newPlanetColour;
 
@@ -93,14 +95,16 @@ void draw() {
   system.background(170, 100, 5);
 
   //Planets -->
-  for (int i = planets.size() - 1; i >= 0; i--) {
-    Planet p = planets.get(i);
-    if (!mousePressed && simRunning) {
-      if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
-        planets.remove(i);
+  for (int t = 0; t < timeStepsPerFrame; t++) {
+    for (int i = planets.size() - 1; i >= 0; i--) {
+      Planet p = planets.get(i);
+      if (!mousePressed && simRunning) {
+        if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
+          planets.remove(i);
 
-      p.applyForce(attract(p));
-      p.update();
+        p.applyForce(attract(p));
+        p.update(1/float(timeStepsPerFrame));
+      }
     }
   }
 

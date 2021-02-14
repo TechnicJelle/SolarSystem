@@ -26,52 +26,19 @@ class Planet {
     acc.add(f);
   }
 
-  void update() {
+  void update(float fac) {
     //Newtonian Physics Calculation -->
-    vel.add(acc);
-    pos.add(vel);
+    vel.add(PVector.mult(acc, fac));
+    pos.add(PVector.mult(vel, fac));
     acc.mult(0);
-
-    onScreen = pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5;
-
-    //Trail Variable Sampling -->
-    if (trailTracking) {
-      if (onScreen) {
-        if (trailHQ) {
-          trail.add(pos.copy());
-        } else {
-          if (vel.mag() > 20) {
-            trail.add(pos.copy());
-          } else if (vel.mag() < 20 && vel.mag() > 15) {
-            if (frameCount % 4 == 0) {
-              trail.add(pos.copy());
-            }
-          } else if (vel.mag() < 15 && vel.mag() > 10) {
-            if (frameCount % 6 == 0) {
-              trail.add(pos.copy());
-            }
-          } else if (vel.mag() < 10 && vel.mag() > 5) {
-            if (frameCount % 7 == 0) {
-              trail.add(pos.copy());
-            }
-          } else if (vel.mag() < 5) {
-            if (frameCount % 8 == 0) {
-              trail.add(pos.copy());
-            }
-          }
-        }
-      }
-
-      //Trail Cleanup -->
-      while (trail.size() > trailLength) {
-        trail.remove(0);
-      }
-    }
   }
 
   void render() {
+    onScreen = pos.x > -width/2 && pos.x < width*1.5 && pos.y > -height/2 && pos.y < height*1.5;
+
     //Trail (Should always be rendered, even if planet is off screen) -->
     if (trailTracking) {
+      trailUpdate();
       system.strokeCap(SQUARE);
       system.noFill();
       system.beginShape();
@@ -104,6 +71,42 @@ class Planet {
         gizmos.fill(255);
         gizmos.textSize(24);
         gizmos.text(vel.mag(), pos.x, pos.y + 32);
+      }
+    }
+  }
+
+  void trailUpdate() {
+    //Trail Variable Sampling -->
+    if (trailTracking) {
+      if (onScreen) {
+        if (trailHQ) {
+          trail.add(pos.copy());
+        } else {
+          if (vel.mag() > 20) {
+            trail.add(pos.copy());
+          } else if (vel.mag() < 20 && vel.mag() > 15) {
+            if (frameCount % 4 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 15 && vel.mag() > 10) {
+            if (frameCount % 6 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 10 && vel.mag() > 5) {
+            if (frameCount % 7 == 0) {
+              trail.add(pos.copy());
+            }
+          } else if (vel.mag() < 5) {
+            if (frameCount % 8 == 0) {
+              trail.add(pos.copy());
+            }
+          }
+        }
+      }
+
+      //Trail Cleanup -->
+      while (trail.size() > trailLength) {
+        trail.remove(0);
       }
     }
   }

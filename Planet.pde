@@ -5,19 +5,19 @@ class Planet {
 
   ArrayList<PVector> trail;
 
-  float radius = 32;
-  float mass = 50;
-  color col = color(255, 128, 0);
+  float radius;
+  float mass;
+  color col;
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, float m, float r, color c) {
+  Planet(float x, float y, float vx, float vy, float m, float r, float hue) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
     acc = new PVector(0, 0);
     mass = m;
     radius = r;
-    col = c;
+    col = color(hue, 255, 255);
     trail = new ArrayList<PVector>();
     for (int i = 0; i < trailLength; i++) {
       trail.add(pos.copy());

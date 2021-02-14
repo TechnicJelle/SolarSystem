@@ -14,7 +14,7 @@ final int timeStepsPerFrame = 10;
 
 color newPlanetMass;
 float newPlanetRadius;
-color newPlanetColour;
+float newPlanetHue;
 
 PGraphics system;
 PGraphics gizmos;
@@ -62,7 +62,7 @@ void setup() {
 
   newPlanetMass = 100;
   newPlanetRadius = 16;
-  newPlanetColour = color(random(255), 255, 255);
+  newPlanetHue = random(255);
 
   for (PVector p : mouse)
     p.mult(mouseSize).add(new PVector(1, 3));
@@ -86,7 +86,7 @@ void mouseReleased() {
       nPvy = nPy - mouseY;
       //Add Planet -->
       if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetColour));
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetHue));
       }
 
       if (!simRunning) {
@@ -102,7 +102,6 @@ void mouseWheel(MouseEvent event) {
   startMassChangeTime = millis();
   showingNewMass = true;
   float e = event.getCount();
-  newPlanetMass = (int)constrain(newPlanetMass - e, 10, SUN_MASS * 2/3);
 }
 
 void draw() {
@@ -158,7 +157,6 @@ void draw() {
       gizmos.noFill();
       switch(mouseButton) {
       case RIGHT: //Size Graphic
-        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), 8, SUN_RADIUS*2/3);
         gizmos.circle(nPx, nPy, newPlanetRadius *2);
         break;
       case LEFT: //Catapult Graphic
@@ -171,10 +169,10 @@ void draw() {
       }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker Pop-Up
-      newPlanetColour = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
+      newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
       gizmos.stroke(128);
       gizmos.strokeWeight(10);
-      gizmos.fill(newPlanetColour);
+      gizmos.fill(color(newPlanetHue, 255, 255));
       gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
     }
   }

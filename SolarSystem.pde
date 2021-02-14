@@ -8,8 +8,11 @@ final float FAC_NEWP = 0.1;
 final float SUN_RADIUS = 64;
 final float SUN_MASS = 500;
 
+final float TEXT_SIZE = 20;
+
 final int timeStepsPerFrame = 10;
 
+color newPlanetMass;
 float newPlanetRadius;
 color newPlanetColour;
 
@@ -57,6 +60,7 @@ void setup() {
   float barHeight = 12;
   barPos = height - barHeight;
 
+  newPlanetMass = 100;
   newPlanetRadius = 16;
   newPlanetColour = color(random(255), 255, 255);
 
@@ -82,7 +86,7 @@ void mouseReleased() {
       nPvy = nPy - mouseY;
       //Add Planet -->
       if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, random(30, 100), newPlanetRadius, newPlanetColour));
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
@@ -90,6 +94,15 @@ void mouseReleased() {
       }
     }
   }
+}
+
+int startMassChangeTime;
+boolean showingNewMass = false;
+void mouseWheel(MouseEvent event) {
+  startMassChangeTime = millis();
+  showingNewMass = true;
+  float e = event.getCount();
+  newPlanetMass = (int)constrain(newPlanetMass - e, 10, SUN_MASS * 2/3);
 }
 
 void draw() {
@@ -126,19 +139,35 @@ void draw() {
     p.render();
   system.endDraw();
 
+  //Mass Changer Gizmo Pop-Up -->
+  if (millis() - startMassChangeTime > 1000) //Hide again after a second
+    showingNewMass = false;
+  if (showingNewMass) {
+    gizmos.noStroke();
+    gizmos.fill(255);
+    gizmos.textSize(TEXT_SIZE);
+    gizmos.textAlign(LEFT, BOTTOM);
+    gizmos.text("m:" + newPlanetMass, mouseX, mouseY);
+  }
+
   //Mouse Actions -->
   if (mousePressed) {
     if (nPy < barPos) {
       gizmos.stroke(255);
       gizmos.strokeWeight(3);
       gizmos.noFill();
-      if (mouseButton == LEFT && dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Catapult Graphic
-        gizmos.circle(nPx, nPy, newPlanetRadius *2);
-        gizmos.strokeCap(ROUND);
-        gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
-      } else if (mouseButton == RIGHT) { //Size Graphic
+      switch(mouseButton) {
+      case RIGHT: //Size Graphic
         newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), 8, SUN_RADIUS*2/3);
         gizmos.circle(nPx, nPy, newPlanetRadius *2);
+        break;
+      case LEFT: //Catapult Graphic
+        if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) {
+          gizmos.circle(nPx, nPy, newPlanetRadius *2);
+          gizmos.strokeCap(ROUND);
+          gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+        }
+        break;
       }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker Pop-Up

@@ -72,10 +72,9 @@ class Planet {
       if (showProperties) {
         gizmos.noStroke();
         gizmos.fill(255);
-        float textSize = 20;
-        gizmos.textSize(textSize);
+        gizmos.textSize(TEXT_SIZE);
         gizmos.textAlign(LEFT, CENTER);
-        gizmos.textLeading(textSize);
+        gizmos.textLeading(TEXT_SIZE);
         gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1), pos.x, pos.y - radius);
       }
     }

@@ -72,38 +72,38 @@ class Planet {
   void render() {
     //Trail (Should always be rendered, even if planet is off screen) -->
     if (trailTracking) {
-      strokeCap(SQUARE);
-      noFill();
-      beginShape();
+      system.strokeCap(SQUARE);
+      system.noFill();
+      system.beginShape();
       for (int i = 0; i < trail.size(); i++) {
         PVector pb = trail.get(i);
-        stroke(col, map(i, 0, trail.size(), 0, 255));
-        strokeWeight(map(i, 0, trail.size(), 0, 5));
-        curveVertex(pb.x, pb.y);
+        system.stroke(col, map(i, 0, trail.size(), 0, 255));
+        system.strokeWeight(map(i, 0, trail.size(), 0, 5));
+        system.curveVertex(pb.x, pb.y);
       }
-      endShape();
+      system.endShape();
     }
 
     if (onScreen) {
       //Planet -->
-      noStroke();
-      fill(col);
-      circle(pos.x, pos.y, radius *2);
+      system.noStroke();
+      system.fill(col);
+      system.circle(pos.x, pos.y, radius *2);
 
       //Heading Vector Line -->
       if (showHeadingLine) {
-        stroke(255);
-        strokeWeight(3);
-        strokeCap(ROUND);
-        line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
+        gizmos.stroke(255);
+        gizmos.strokeWeight(3);
+        gizmos.strokeCap(ROUND);
+        gizmos.line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
       }
 
       //Velocity Text -->
       if (showVelocity) {
-        noStroke();
-        fill(255);
-        textSize(32);
-        text(vel.mag(), pos.x, pos.y + 32);
+        gizmos.noStroke();
+        gizmos.fill(255);
+        gizmos.textSize(24);
+        gizmos.text(vel.mag(), pos.x, pos.y + 32);
       }
     }
   }

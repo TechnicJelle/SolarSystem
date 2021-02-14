@@ -10,6 +10,9 @@ final float SUN_RADIUS = 64;
 float newPlanetRadius;
 color newPlanetColour;
 
+PGraphics system;
+PGraphics gizmos;
+
 float barPos;
 
 float wd3;
@@ -38,6 +41,10 @@ void setup() {
   colorMode(HSB);
   hint(ENABLE_ASYNC_SAVEFRAME);
   noCursor();
+
+  system = createGraphics(width, height, P2D); //P2D is needed for the trails
+  gizmos = createGraphics(width, height);
+
   wd3 = width/3;
   colSegWidth = wd3/128;
   wd3csw = wd3 + colSegWidth;
@@ -81,7 +88,9 @@ void mouseReleased() {
 }
 
 void draw() {
-  background(0, 0, 10);
+  system.beginDraw();
+  system.colorMode(HSB);
+  system.background(170, 100, 5);
 
   //Planets -->
   for (int i = planets.size() - 1; i >= 0; i--) {
@@ -93,65 +102,78 @@ void draw() {
       p.applyForce(attract(p));
       p.update();
     }
-    p.render();
   }
 
   //Sun -->
-  noStroke();
-  fill(32, 255, 255);
-  circle(sun.x, sun.y, SUN_RADIUS *2);
+  system.noStroke();
+  system.fill(32, 255, 255);
+  system.circle(sun.x, sun.y, SUN_RADIUS *2);
+
+
+  if (frameCount > 1)
+    gizmos.clear();
+  gizmos.beginDraw();
+  gizmos.colorMode(HSB);
+
+  for (Planet p : planets) //Planets contain both system and gizmos graphics
+    p.render();
+  system.endDraw();
 
   //Mouse Actions -->
   if (mousePressed) {
     if (nPy < barPos) {
-      stroke(255);
-      strokeWeight(3);
-      noFill();
+      gizmos.stroke(255);
+      gizmos.strokeWeight(3);
+      gizmos.noFill();
       if (mouseButton == LEFT && dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Catapult Graphic
-        circle(nPx, nPy, newPlanetRadius *2);
-        strokeCap(ROUND);
-        line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+        gizmos.circle(nPx, nPy, newPlanetRadius *2);
+        gizmos.strokeCap(ROUND);
+        gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
       } else if (mouseButton == RIGHT) { //Size Graphic
         newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), 8, SUN_RADIUS*2/3);
-        circle(nPx, nPy, newPlanetRadius *2);
+        gizmos.circle(nPx, nPy, newPlanetRadius *2);
       }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
-      //Colour Picker
+      //Colour Picker Pop-Up
       newPlanetColour = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
-      stroke(128);
-      strokeWeight(10);
-      fill(newPlanetColour);
-      rect(mouseX, barPos - 32, width/10, -width/10, 20);
+      gizmos.stroke(128);
+      gizmos.strokeWeight(10);
+      gizmos.fill(newPlanetColour);
+      gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
     }
   }
 
-  //Colour Picker Render -->
+  //Colour Picker Bar -->
   if (showColourBar) {
-    strokeWeight(colSegWidth);
-    strokeCap(SQUARE);
+    gizmos.strokeWeight(colSegWidth);
+    gizmos.strokeCap(SQUARE);
     for (float i = 0; i < wd3+1; i+=colSegWidth) {
-      stroke(map(i, 0, wd3, 0, 255), 255, 255, 200);
-      line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
+      gizmos.stroke(map(i, 0, wd3, 0, 255), 255, 255, 200);
+      gizmos.line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
     }
   }
 
   //Custom Cursor -->
-  pushMatrix();
-  translate(mouseX, mouseY);
-  noFill();
-  stroke(255, 128);
-  strokeWeight(3);
-  beginShape();
+  gizmos.pushMatrix();
+  gizmos.translate(mouseX, mouseY);
+  gizmos.noFill();
+  gizmos.stroke(255, 128);
+  gizmos.strokeWeight(3);
+  gizmos.beginShape();
   for (PVector p : mouse)
-    vertex(p.x, p.y);
-  endShape(CLOSE);
-  stroke(255, 200);
-  strokeWeight(1);
-  beginShape();
+    gizmos.vertex(p.x, p.y);
+  gizmos.endShape(CLOSE);
+  gizmos.stroke(255, 200);
+  gizmos.strokeWeight(1);
+  gizmos.beginShape();
   for (PVector p : mouse)
-    vertex(p.x, p.y);
-  endShape(CLOSE);
-  popMatrix();
+    gizmos.vertex(p.x, p.y);
+  gizmos.endShape(CLOSE);
+  gizmos.popMatrix();
+
+  gizmos.endDraw();
+  image(system, 0, 0);
+  image(gizmos, 0, 0);
 }
 
 PVector attract(Planet p) {
@@ -204,7 +226,7 @@ void keyPressed() {
       }
       break;
     case 's':
-      save("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
+      system.save("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
       break;
     }
   }

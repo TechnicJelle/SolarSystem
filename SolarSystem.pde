@@ -18,7 +18,7 @@ final float TEXT_SIZE = 20;
 
 final int timeStepsPerFrame = 10;
 
-color newPlanetMass;
+float newPlanetMass;
 float newPlanetRadius;
 float newPlanetHue;
 
@@ -108,7 +108,7 @@ void mouseWheel(MouseEvent event) {
   startMassChangeTime = millis();
   showingNewMass = true;
   float e = event.getCount();
-  newPlanetMass = (int)constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
+  newPlanetMass = constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
 }
 
 void draw() {
@@ -153,7 +153,7 @@ void draw() {
     gizmos.fill(255);
     gizmos.textSize(TEXT_SIZE);
     gizmos.textAlign(LEFT, BOTTOM);
-    gizmos.text("m:" + newPlanetMass, mouseX, mouseY);
+    gizmos.text("m:" + round(newPlanetMass), mouseX, mouseY);
   }
 
   //Mouse Actions -->

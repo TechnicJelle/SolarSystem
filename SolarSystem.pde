@@ -21,6 +21,8 @@ float wd3;
 float colSegWidth;
 float wd3csw;
 
+boolean simHalted = false;
+
 //Settings -->
 int trailLength = 100;
 boolean trailTracking = true;
@@ -69,11 +71,11 @@ void mousePressed() {
   //Start Coordinates -->
   nPx = mouseX;
   nPy = mouseY;
-  simRunning = false;
+  simHalted = true;
 }
 
 void mouseReleased() {
-  simRunning = true;
+  simHalted = false;
   if (nPy < barPos) {
     if (mouseButton == LEFT) {
       //Relative End Coordinates -->
@@ -100,7 +102,7 @@ void draw() {
   for (int t = 0; t < timeStepsPerFrame; t++) {
     for (int i = planets.size() - 1; i >= 0; i--) {
       Planet p = planets.get(i);
-      if (!mousePressed && simRunning) {
+      if (!mousePressed && simRunning && !simHalted) {
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
           planets.remove(i);
 

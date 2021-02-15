@@ -66,7 +66,7 @@ void setup() {
   float barHeight = 12;
   barPos = height - barHeight;
 
-  newPlanetMass = 100;
+  newPlanetMass = round(MAX_PLANET_MASS/2);
   newPlanetRadius = 16;
   newPlanetHue = random(255);
 

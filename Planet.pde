@@ -117,7 +117,13 @@ class Planet {
     }
   }
 
-  color colourFromMass(float hue, float mass) {
-    return color(hue, 255, 255);
+color colourFromMass(float hue, float mass) {
+    float angleRedux = (1.0 / 16.0) * PI ; //(reduction geddit)
+    float colourAngle = (((PI / 2) - (2 * angleRedux)) * ((mass - MIN_PLANET_MASS)/(MAX_PLANET_MASS - MIN_PLANET_MASS))) + angleRedux;
+    float colourRadius = 255 * ((-(sqrt(2)-1) * 16 * colourAngle * (colourAngle - (PI / 2))/(PI * PI)) + 1);
+    float satDepMass = colourRadius * sin(colourAngle); //sat dependent on mass
+    float valDepMass = colourRadius * cos(colourAngle); //val dependent on mass
+    println(valDepMass);
+    return color(hue, satDepMass, valDepMass);
   }
 }

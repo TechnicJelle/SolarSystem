@@ -21,6 +21,7 @@ final int timeStepsPerFrame = 10;
 float newPlanetMass;
 float newPlanetRadius;
 float newPlanetHue;
+color newPlanetColour;
 
 PGraphics system;
 PGraphics gizmos;
@@ -71,6 +72,7 @@ void setup() {
   newPlanetMass = round(MAX_PLANET_MASS/2);
   newPlanetRadius = 16;
   newPlanetHue = random(255);
+  updateNewPlanetColour();
 
   for (PVector p : mouse)
     p.mult(mouseSize).add(new PVector(1, 3));
@@ -94,7 +96,7 @@ void mouseReleased() {
       nPvy = nPy - mouseY;
       //Add Planet -->
       if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetHue));
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
@@ -111,6 +113,7 @@ void mouseWheel(MouseEvent event) {
   showingNewMass = true;
   float e = event.getCount();
   newPlanetMass = constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
+  updateNewPlanetColour();
 }
 
 void draw() {
@@ -180,7 +183,8 @@ void draw() {
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker Pop-Up
       newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
-      gizmos.stroke(128);
+      updateNewPlanetColour();
+      gizmos.stroke(newPlanetColour);
       gizmos.strokeWeight(10);
       gizmos.fill(color(newPlanetHue, 255, 255));
       gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
@@ -200,7 +204,7 @@ void draw() {
   //Custom Cursor -->
   gizmos.pushMatrix();
   gizmos.translate(mouseX, mouseY);
-  gizmos.noFill();
+  gizmos.fill(newPlanetColour, 128);
   gizmos.stroke(255, 128);
   gizmos.strokeWeight(3);
   gizmos.beginShape();
@@ -234,6 +238,19 @@ PVector attractMass(Planet p) {
   float rsq = sq(dist(sun, p.pos));
   float q = m/rsq;
   return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
+}
+
+void updateNewPlanetColour() {
+  newPlanetColour = colourFromMass(newPlanetHue, newPlanetMass);
+}
+
+color colourFromMass(float hue, float mass) {
+  float angleRedux = (1.0 / 16.0) * PI ; //(reduction geddit)
+  float colourAngle = (((PI / 2) - (2 * angleRedux)) * ((mass - MIN_PLANET_MASS)/(MAX_PLANET_MASS - MIN_PLANET_MASS))) + angleRedux;
+  float colourRadius = 255 * ((-(sqrt(2)-1) * 16 * colourAngle * (colourAngle - (PI / 2))/(PI * PI)) + 1);
+  float satDepMass = colourRadius * sin(colourAngle); //sat dependent on mass
+  float valDepMass = colourRadius * cos(colourAngle); //val dependent on mass
+  return color(hue, satDepMass, valDepMass);
 }
 
 void keyPressed() {

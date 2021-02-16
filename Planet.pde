@@ -11,13 +11,13 @@ class Planet {
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, float m, float r, float hue) {
+  Planet(float x, float y, float vx, float vy, float m, float r, color c) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
     acc = new PVector(0, 0);
     mass = m;
     radius = r;
-    col = colourFromMass(hue, mass);
+    col = c;
     trail = new ArrayList<PVector>();
     for (int i = 0; i < trailLength; i++) {
       trail.add(pos.copy());
@@ -115,15 +115,5 @@ class Planet {
         trail.remove(0);
       }
     }
-  }
-
-  color colourFromMass(float hue, float mass) {
-    float angleRedux = (1.0 / 16.0) * PI ; //(reduction geddit)
-    float colourAngle = (((PI / 2) - (2 * angleRedux)) * ((mass - MIN_PLANET_MASS)/(MAX_PLANET_MASS - MIN_PLANET_MASS))) + angleRedux;
-    float colourRadius = 255 * ((-(sqrt(2)-1) * 16 * colourAngle * (colourAngle - (PI / 2))/(PI * PI)) + 1);
-    float satDepMass = colourRadius * sin(colourAngle); //sat dependent on mass
-    float valDepMass = colourRadius * cos(colourAngle); //val dependent on mass
-    println(valDepMass);
-    return color(hue, satDepMass, valDepMass);
   }
 }

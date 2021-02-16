@@ -11,9 +11,9 @@ class Planet {
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, float m, float r, color c) {
-    pos = new PVector(x, y);
-    vel = new PVector(vx, vy).mult(FAC_NEWP);
+  Planet(PVector p, PVector v, float m, float r, color c) {
+    pos = p;
+    vel = v.mult(FAC_NEWP);
     acc = new PVector(0, 0);
     mass = m;
     radius = r;
@@ -74,9 +74,7 @@ class Planet {
         gizmos.noStroke();
         gizmos.fill(255);
         gizmos.textSize(TEXT_SIZE);
-        gizmos.textAlign(LEFT, CENTER);
         gizmos.textLeading(TEXT_SIZE);
-        gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1), pos.x, pos.y - radius);
       }
     }
   }

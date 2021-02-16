@@ -22,6 +22,8 @@ float newPlanetMass;
 float newPlanetRadius;
 float newPlanetHue;
 color newPlanetColour;
+PVector newPlanetPos;
+PVector newPlanetVel;
 
 PGraphics system;
 PGraphics gizmos;
@@ -81,25 +83,19 @@ void setup() {
     p.mult(mouseSize).add(new PVector(1, 3));
 }
 
-float nPx, nPy;
-float nPvx, nPvy;
 void mousePressed() {
   //Start Coordinates -->
-  nPx = mouseX;
-  nPy = mouseY;
+  newPlanetPos = new PVector(mouseX, mouseY);
   simHalted = true;
 }
 
 void mouseReleased() {
   simHalted = false;
-  if (nPy < barPos) {
+  if (newPlanetPos.y < barPos) {
     if (mouseButton == LEFT) {
-      //Relative End Coordinates -->
-      nPvx = nPx - mouseX;
-      nPvy = nPy - mouseY;
       //Add Planet -->
-      if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetColour));
+      if (dist(newPlanetPos, sun) > SUN_RADIUS) { //Not in sun
+        planets.add(new Planet(newPlanetPos, newPlanetVel, newPlanetMass, newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
@@ -166,24 +162,26 @@ void draw() {
 
   //Mouse Actions -->
   if (mousePressed) {
-    if (nPy < barPos) {
+    if (newPlanetPos.y < barPos) {
       gizmos.stroke(255);
       gizmos.strokeWeight(3);
       gizmos.noFill();
       switch(mouseButton) {
       case RIGHT: //Size Graphic
-        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
-        gizmos.circle(nPx, nPy, newPlanetRadius *2);
+        newPlanetRadius = constrain(dist(newPlanetPos.x, newPlanetPos.y, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
+        gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
         break;
       case LEFT: //Catapult Graphic
-        if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) {
-          gizmos.circle(nPx, nPy, newPlanetRadius *2);
+        if (dist(newPlanetPos, sun) > SUN_RADIUS) {
+          //Relative End Coordinates -->
+          newPlanetVel = PVector.sub(newPlanetPos, new PVector(mouseX, mouseY));
+          gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
           gizmos.strokeCap(ROUND);
-          gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+          gizmos.line(newPlanetPos.x, newPlanetPos.y, newPlanetPos.x + FAC_NEWP*(newPlanetPos.x - mouseX), newPlanetPos.y + FAC_NEWP*(newPlanetPos.y - mouseY));
         }
         break;
       }
-    } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
+    } else if (newPlanetPos.y > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker Pop-Up
       newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
       updateNewPlanetColour();

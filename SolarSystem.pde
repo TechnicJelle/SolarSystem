@@ -33,6 +33,7 @@ float colSegWidth;
 float wd3csw;
 
 boolean simHalted = false;
+boolean alternateAction = false;
 
 //Settings -->
 int trailLength = 100;
@@ -111,7 +112,7 @@ boolean showingNewMass = false;
 void mouseWheel(MouseEvent event) {
   startMassChangeTime = millis();
   showingNewMass = true;
-  float e = event.getCount();
+  float e = event.getCount() * (alternateAction ? 4 : 1);
   newPlanetMass = constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
   updateNewPlanetColour();
 }
@@ -122,10 +123,6 @@ void draw() {
   system.background(170, 100, 5);
 
   //Planets -->
-  for (int t = 0; t < timeStepsPerFrame; t++) {
-    for (int i = planets.size() - 1; i >= 0; i--) {
-      Planet p = planets.get(i);
-      if (!mousePressed && simRunning && !simHalted) {
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
           planets.remove(i);
 
@@ -169,7 +166,7 @@ void draw() {
       gizmos.noFill();
       switch(mouseButton) {
       case RIGHT: //Size Graphic
-        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
+        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
         gizmos.circle(nPx, nPy, newPlanetRadius *2);
         break;
       case LEFT: //Catapult Graphic
@@ -256,6 +253,9 @@ color colourFromMass(float hue, float mass) {
 void keyPressed() {
   if (key == CODED) {
     switch(keyCode) {
+    case SHIFT:
+      alternateAction = true;
+      break;
     }
   } else {
     switch(key) {
@@ -299,6 +299,19 @@ void keyPressed() {
     case 'S':
       save(getScreenshotName());
       break;
+    }
+  }
+}
+
+void keyReleased() {
+  if (key == CODED) {
+    switch(keyCode) {
+    case SHIFT:
+      alternateAction = false;
+      break;
+    }
+  } else {
+    switch(key) {
     }
   }
 }

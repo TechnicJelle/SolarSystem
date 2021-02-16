@@ -18,6 +18,7 @@ A simple solar system simulation environment where you can play around with plan
 `X` Remove a Planet (Hover over it with your cursor)\
 `Z` Remove all offscreen Planets\
 `S` Save Screenshot (will be saved in a screenshots folder next to the executable as *YYYYMMDD_hhmmss.png*)\
+`Shift` + `S` Save Screenshot with all Gizmos visible\
 `Esc` Close the program
 
 ## Screenshots

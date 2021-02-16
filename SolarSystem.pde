@@ -294,10 +294,17 @@ void keyPressed() {
       }
       break;
     case 's':
-      system.save("/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png");
+      system.save(getScreenshotName());
+      break;
+    case 'S':
+      save(getScreenshotName());
       break;
     }
   }
+}
+
+String getScreenshotName() {
+  return "/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png";
 }
 
 float dist(PVector v1, PVector v2) {

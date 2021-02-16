@@ -8,7 +8,9 @@ A simple solar system simulation environment where you can play around with plan
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
 `Right Click (Drag)` Change the size for new Planets\
+`Shift` + `Right Click (Drag)` Change the size more accurately\
 `Scroll` Change the mass for new Planets\
+`Shift` + `Scroll` Change the mass faster\
 `Space` **Play**/Pause the simulation\
 `T` Turn Trail **On**/Off\
 `H` Turn Heading Line On/**Off**\

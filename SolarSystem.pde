@@ -33,6 +33,8 @@ float colSegWidth;
 float wd3csw;
 
 boolean simHalted = false;
+
+final int alternateButton = SHIFT; //ALT, because alternate
 boolean alternateAction = false;
 
 //Settings -->
@@ -257,7 +259,7 @@ color colourFromMass(float hue, float mass) {
 void keyPressed() {
   if (key == CODED) {
     switch(keyCode) {
-    case SHIFT:
+    case alternateButton:
       alternateAction = true;
       break;
     }
@@ -298,10 +300,12 @@ void keyPressed() {
       }
       break;
     case 's':
-      system.save(getScreenshotName());
-      break;
     case 'S':
-      save(getScreenshotName());
+      String screenshotName = "/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png";
+      if (alternateAction)
+        save(screenshotName);
+      else
+        system.save(screenshotName);
       break;
     }
   }
@@ -310,7 +314,7 @@ void keyPressed() {
 void keyReleased() {
   if (key == CODED) {
     switch(keyCode) {
-    case SHIFT:
+    case alternateButton:
       alternateAction = false;
       break;
     }
@@ -318,10 +322,6 @@ void keyReleased() {
     switch(key) {
     }
   }
-}
-
-String getScreenshotName() {
-  return "/screenshots/" + year() + nf(month(), 2) + nf(day(), 2) + "_" + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2) + ".png";
 }
 
 float dist(PVector v1, PVector v2) {

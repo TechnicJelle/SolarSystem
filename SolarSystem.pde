@@ -282,7 +282,14 @@ void keyPressed() {
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
           int pieces = (int)random(2, 6);
           for (int j=0; j < pieces; j++) {
-            planets.add(new Planet(p.pos.x+random(-p.radius, p.radius), p.pos.y+random(-p.radius, p.radius), p.vel.x / FAC_NEWP, p.vel.y / FAC_NEWP, p.radius/pieces, p.col));
+            float newPosX = p.pos.x + random(-p.radius, p.radius);
+            float newPosY = p.pos.y + random(-p.radius, p.radius);
+            float newVelX = p.vel.x / FAC_NEWP;
+            float newVelY = p.vel.y / FAC_NEWP;
+            float newMass = p.mass / pieces;
+            float newRadius =  p.radius / pieces;
+            float newHue = hue(p.col);
+            planets.add(new Planet(newPosX, newPosY, newVelX, newVelY, newMass, newRadius, newHue));
           }
           planets.remove(i);
         }

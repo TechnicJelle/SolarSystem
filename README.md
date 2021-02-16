@@ -37,7 +37,7 @@ A simple solar system simulation environment where you can play around with plan
 
 
 ![Challenge!](/.github/images/pc_challenge.png "Challenge")\
-*Try to get a planet in a tighter orbit that this*
+*Try to get a planet in a tighter orbit than this*
 
 
 ![GIF](/.github/images/pc_anim1.gif "GIF")\

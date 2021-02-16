@@ -3,7 +3,7 @@ A simple solar system simulation environment where you can play around with plan
 
 ## [Click here to download!](../../releases/latest)
 
-![GIF](/.github/images/pc_anim.gif "GIF")
+![GIF](/.github/images/pc_anim2.gif "GIF")
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
@@ -28,8 +28,17 @@ A simple solar system simulation environment where you can play around with plan
 *Default Settings*
 
 
+![Now with Mass!](/.github/images/pc_samehue.png "Now with Mass")\
+*Now with Mass! These three planets all have the same hue, but due to their difference in mass, their colour is different*
+
+
 ![Now with Sizes!](/.github/images/pc_newsize.png "Now with Sizes")\
 *Now with Sizes*
 
-![Heading, Velocity and Colour Picker Settings](/.github/images/pc_settings.png "Heading, Velocity and Colour Picker Settings")\
-*Heading, Velocity and Colour Picker Settings*
+
+![Challenge!](/.github/images/pc_challenge.png "Challenge")\
+*Try to get a planet in a tighter orbit that this*
+
+
+![GIF](/.github/images/pc_anim1.gif "GIF")\
+*An older GIF, but still enjoyable*

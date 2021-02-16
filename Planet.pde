@@ -5,17 +5,19 @@ class Planet {
 
   ArrayList<PVector> trail;
 
-  float radius = 32;
-  color col = color(255, 128, 0);
+  float radius;
+  float mass;
+  color col;
 
   boolean onScreen = true;
 
-  Planet(float x, float y, float vx, float vy, float r, color c) {
+  Planet(float x, float y, float vx, float vy, float m, float r, float hue) {
     pos = new PVector(x, y);
     vel = new PVector(vx, vy).mult(FAC_NEWP);
     acc = new PVector(0, 0);
+    mass = m;
     radius = r;
-    col = c;
+    col = colourFromMass(hue, mass);
     trail = new ArrayList<PVector>();
     for (int i = 0; i < trailLength; i++) {
       trail.add(pos.copy());
@@ -23,6 +25,7 @@ class Planet {
   }
 
   void applyForce(PVector f) {
+    f.div(mass); //Do take the mass into account in F = m * a  ==>  a = F / m
     acc.add(f);
   }
 
@@ -38,7 +41,7 @@ class Planet {
 
     //Trail (Should always be rendered, even if planet is off screen) -->
     if (trailTracking) {
-      if (simRunning)
+      if (simRunning && !simHalted)
         trailUpdate();
       system.strokeCap(SQUARE);
       system.noFill();
@@ -67,11 +70,13 @@ class Planet {
       }
 
       //Velocity Text -->
-      if (showVelocity) {
+      if (showProperties) {
         gizmos.noStroke();
         gizmos.fill(255);
-        gizmos.textSize(24);
-        gizmos.text(vel.mag(), pos.x, pos.y + 32);
+        gizmos.textSize(TEXT_SIZE);
+        gizmos.textAlign(LEFT, CENTER);
+        gizmos.textLeading(TEXT_SIZE);
+        gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1), pos.x, pos.y - radius);
       }
     }
   }
@@ -110,5 +115,15 @@ class Planet {
         trail.remove(0);
       }
     }
+  }
+
+  color colourFromMass(float hue, float mass) {
+    float angleRedux = (1.0 / 16.0) * PI ; //(reduction geddit)
+    float colourAngle = (((PI / 2) - (2 * angleRedux)) * ((mass - MIN_PLANET_MASS)/(MAX_PLANET_MASS - MIN_PLANET_MASS))) + angleRedux;
+    float colourRadius = 255 * ((-(sqrt(2)-1) * 16 * colourAngle * (colourAngle - (PI / 2))/(PI * PI)) + 1);
+    float satDepMass = colourRadius * sin(colourAngle); //sat dependent on mass
+    float valDepMass = colourRadius * cos(colourAngle); //val dependent on mass
+    println(valDepMass);
+    return color(hue, satDepMass, valDepMass);
   }
 }

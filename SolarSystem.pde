@@ -123,6 +123,10 @@ void draw() {
   system.background(170, 100, 5);
 
   //Planets -->
+  if (!mousePressed && simRunning && !simHalted) {
+    for (int t = 0; t < timeStepsPerFrame; t++) {
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
           planets.remove(i);
 

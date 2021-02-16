@@ -2,15 +2,25 @@ PVector sun;
 
 ArrayList<Planet> planets;
 
-final float FAC_GRAV = 100000;
+final float FAC_GRAV = 100;
 final float FAC_NEWP = 0.1;
 
 final float SUN_RADIUS = 64;
+final float SUN_MASS = 500;
+
+final float MIN_PLANET_RADIUS = 8;
+final float MAX_PLANET_RADIUS = SUN_RADIUS * 2/3;
+
+final float MIN_PLANET_MASS = 10;
+final float MAX_PLANET_MASS = SUN_MASS * 2/3;
+
+final float TEXT_SIZE = 20;
 
 final int timeStepsPerFrame = 10;
 
+float newPlanetMass;
 float newPlanetRadius;
-color newPlanetColour;
+float newPlanetHue;
 
 PGraphics system;
 PGraphics gizmos;
@@ -29,7 +39,7 @@ boolean trailTracking = true;
 boolean trailHQ = true;
 boolean simRunning = true;
 boolean showHeadingLine = false;
-boolean showVelocity = false;
+boolean showProperties = false;
 boolean showColourBar = true;
 
 float mouseSize = 32;
@@ -58,8 +68,9 @@ void setup() {
   float barHeight = 12;
   barPos = height - barHeight;
 
+  newPlanetMass = round(MAX_PLANET_MASS/2);
   newPlanetRadius = 16;
-  newPlanetColour = color(random(255), 255, 255);
+  newPlanetHue = random(255);
 
   for (PVector p : mouse)
     p.mult(mouseSize).add(new PVector(1, 3));
@@ -83,7 +94,7 @@ void mouseReleased() {
       nPvy = nPy - mouseY;
       //Add Planet -->
       if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetRadius, newPlanetColour));
+        planets.add(new Planet(nPx, nPy, nPvx, nPvy, newPlanetMass, newPlanetRadius, newPlanetHue));
       }
 
       if (!simRunning) {
@@ -91,6 +102,15 @@ void mouseReleased() {
       }
     }
   }
+}
+
+int startMassChangeTime;
+boolean showingNewMass = false;
+void mouseWheel(MouseEvent event) {
+  startMassChangeTime = millis();
+  showingNewMass = true;
+  float e = event.getCount();
+  newPlanetMass = constrain(newPlanetMass - e, MIN_PLANET_MASS, MAX_PLANET_MASS);
 }
 
 void draw() {
@@ -106,7 +126,7 @@ void draw() {
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
           planets.remove(i);
 
-        p.applyForce(attract(p));
+        p.applyForce(attractMass(p));
         p.update(1/float(timeStepsPerFrame));
       }
     }
@@ -127,26 +147,42 @@ void draw() {
     p.render();
   system.endDraw();
 
+  //Mass Changer Gizmo Pop-Up -->
+  if (millis() - startMassChangeTime > 1000) //Hide again after a second
+    showingNewMass = false;
+  if (showingNewMass) {
+    gizmos.noStroke();
+    gizmos.fill(255);
+    gizmos.textSize(TEXT_SIZE);
+    gizmos.textAlign(LEFT, BOTTOM);
+    gizmos.text("m:" + round(newPlanetMass), mouseX, mouseY);
+  }
+
   //Mouse Actions -->
   if (mousePressed) {
     if (nPy < barPos) {
       gizmos.stroke(255);
       gizmos.strokeWeight(3);
       gizmos.noFill();
-      if (mouseButton == LEFT && dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) { //Catapult Graphic
+      switch(mouseButton) {
+      case RIGHT: //Size Graphic
+        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
         gizmos.circle(nPx, nPy, newPlanetRadius *2);
-        gizmos.strokeCap(ROUND);
-        gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
-      } else if (mouseButton == RIGHT) { //Size Graphic
-        newPlanetRadius = constrain(dist(nPx, nPy, mouseX, mouseY), 8, SUN_RADIUS*2/3);
-        gizmos.circle(nPx, nPy, newPlanetRadius *2);
+        break;
+      case LEFT: //Catapult Graphic
+        if (dist(nPx, nPy, sun.x, sun.y) > SUN_RADIUS) {
+          gizmos.circle(nPx, nPy, newPlanetRadius *2);
+          gizmos.strokeCap(ROUND);
+          gizmos.line(nPx, nPy, nPx + FAC_NEWP*(nPx - mouseX), nPy + FAC_NEWP*(nPy - mouseY));
+        }
+        break;
       }
     } else if (nPy > barPos && mouseX < wd3csw && showColourBar) {
       //Colour Picker Pop-Up
-      newPlanetColour = color(map(mouseX, 0, wd3csw, 0, 255), 255, 255);
+      newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
       gizmos.stroke(128);
       gizmos.strokeWeight(10);
-      gizmos.fill(newPlanetColour);
+      gizmos.fill(color(newPlanetHue, 255, 255));
       gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
     }
   }
@@ -193,6 +229,13 @@ PVector attract(Planet p) {
   return f;
 }
 
+PVector attractMass(Planet p) {
+  float m = SUN_MASS * p.mass;
+  float rsq = sq(dist(sun, p.pos));
+  float q = m/rsq;
+  return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
+}
+
 void keyPressed() {
   if (key == CODED) {
     switch(keyCode) {
@@ -208,8 +251,8 @@ void keyPressed() {
     case 'h':
       showHeadingLine = !showHeadingLine;
       break;
-    case 'v':
-      showVelocity = !showVelocity;
+    case 'p':
+      showProperties = !showProperties;
       break;
     case 'c':
       showColourBar = !showColourBar;

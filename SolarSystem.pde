@@ -90,6 +90,7 @@ void mousePressed() {
 
 void mouseReleased() {
   simHalted = false;
+  newPlanetVel = PVector.sub(newPlanetPos, new PVector(mouseX, mouseY));
   if (newPlanetPos.y < barPos) {
     if (mouseButton == LEFT) {
       //Add Planet -->

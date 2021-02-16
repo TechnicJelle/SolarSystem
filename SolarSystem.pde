@@ -1,10 +1,6 @@
-PVector sun;
-
 ArrayList<Planet> planets;
 
-final float FAC_GRAV = 100;
-final float FAC_NEWP = 0.1;
-
+PVector sun;
 final float SUN_RADIUS = 64;
 final float SUN_MASS = 500;
 
@@ -13,6 +9,9 @@ final float MAX_PLANET_RADIUS = SUN_RADIUS * 2/3;
 
 final float MIN_PLANET_MASS = 10;
 final float MAX_PLANET_MASS = SUN_MASS * 2/3;
+
+final float FAC_GRAV = 100;
+final float FAC_NEWP = 0.1;
 
 final float TEXT_SIZE = 20;
 
@@ -145,6 +144,15 @@ void draw() {
   gizmos.beginDraw();
   gizmos.colorMode(HSB);
 
+  if (showProperties) {
+    gizmos.noStroke();
+    gizmos.fill(255);
+    gizmos.textSize(TEXT_SIZE);
+    gizmos.textAlign(CENTER, CENTER);
+    gizmos.textLeading(TEXT_SIZE);
+    gizmos.text("m:" + SUN_MASS + "\nr:" + SUN_RADIUS, sun.x, sun.y);
+  }
+
   for (Planet p : planets) //Planets contain both system and gizmos graphics
     p.render();
   system.endDraw();
@@ -170,6 +178,13 @@ void draw() {
       case RIGHT: //Size Graphic
         newPlanetRadius = constrain(dist(newPlanetPos.x, newPlanetPos.y, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
         gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
+        if (showProperties) {
+          gizmos.noStroke();
+          gizmos.fill(255);
+          gizmos.textSize(TEXT_SIZE);
+          gizmos.textAlign(LEFT, BOTTOM);
+          gizmos.text(nfc(newPlanetRadius, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
+        }
         break;
       case LEFT: //Catapult Graphic
         if (dist(newPlanetPos, sun) > SUN_RADIUS) {
@@ -178,6 +193,13 @@ void draw() {
           gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
           gizmos.strokeCap(ROUND);
           gizmos.line(newPlanetPos.x, newPlanetPos.y, newPlanetPos.x + FAC_NEWP*(newPlanetPos.x - mouseX), newPlanetPos.y + FAC_NEWP*(newPlanetPos.y - mouseY));
+          if (showProperties) {
+            gizmos.noStroke();
+            gizmos.fill(255);
+            gizmos.textSize(TEXT_SIZE);
+            gizmos.textAlign(LEFT, BOTTOM);
+            gizmos.text(nfc(newPlanetVel.mag()*FAC_NEWP, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
+          }
         }
         break;
       }

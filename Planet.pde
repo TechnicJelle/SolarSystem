@@ -74,7 +74,9 @@ class Planet {
         gizmos.noStroke();
         gizmos.fill(255);
         gizmos.textSize(TEXT_SIZE);
+        gizmos.textAlign(LEFT, BOTTOM);
         gizmos.textLeading(TEXT_SIZE);
+        gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1) + "\nr:" + nfc(radius, 1), pos.x, pos.y);
       }
     }
   }

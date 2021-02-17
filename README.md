@@ -3,7 +3,8 @@ A simple solar system simulation environment where you can play around with plan
 
 ## [Click here to download!](../../releases/latest)
 
-![GIF](/.github/images/pc_anim2.gif "GIF")
+![GIF](/.github/images/pc_anim3-destruction.gif "GIF")
+*Latest Update: Planet Destruction!*
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
@@ -29,8 +30,12 @@ A simple solar system simulation environment where you can play around with plan
 *Default Settings*
 
 
-![Now with Mass!](/.github/images/pc_samehue.png "Now with Mass")\
+![Now with Mass! A screenshot](/.github/images/pc_samehue.png "Now with Mass! A screenshot")\
 *Now with Mass! These three planets all have the same hue, but due to their difference in mass, their colour is different*
+
+
+![Now with Mass! A GIF](/.github/images/pc_anim2-mass.gif "Now with Mass! A GIF")\
+*Now with Mass! A GIF*
 
 
 ![Now with Sizes!](/.github/images/pc_newsize.png "Now with Sizes")\
@@ -38,8 +43,8 @@ A simple solar system simulation environment where you can play around with plan
 
 
 ![Challenge!](/.github/images/pc_challenge.png "Challenge")\
-*Try to get a planet in a tighter orbit than this*
+*Try to get a planet in a tighter orbit than this. Current recordholder is https://github.com/EV4gamer*
 
 
-![GIF](/.github/images/pc_anim1.gif "GIF")\
-*An older GIF, but still enjoyable*
+![GIF](/.github/images/pc_anim1-classic.gif "GIF")\
+*An GIF of one of the first versions*

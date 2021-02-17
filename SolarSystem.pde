@@ -344,17 +344,17 @@ void keyPressed() {
           for (int j=0; j < pieces; j++) {
             newMasses[j] *= massFac;
             newRadii[j] *= sqrt(areaFac);
-            if(pieces-1 != j) {
+            if (pieces-1 != j) {
               newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
               newVels[pieces-1].sub(newVels[j]);
             }
             newVels[j].div(newMasses[j]);
           }
           for (int j=0; j < pieces; j++) {
-            PVector newVel = PVector.add(newVels[j], p.vel);
+            PVector newVel = PVector.add(PVector.mult(newVels[j], 0.5), p.vel);
             float spawningLimit = p.radius - newRadii[j];
             PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
-            if(newRadii[j] >= MIN_PLANET_RADIUS/2) {
+            if (newRadii[j] >= MIN_PLANET_RADIUS/2) {
               planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
             }
           }

@@ -333,7 +333,8 @@ void keyPressed() {
             float newMass = p.mass / pieces;
             float newRadius =  p.radius / pieces;
             float newHue = hue(p.col);
-            planets.add(new Planet(newPosX, newPosY, newVelX, newVelY, newMass, newRadius, newHue));
+            color newCol = colourFromMass(newHue, newMass);
+            planets.add(new Planet(new PVector(newPosX, newPosY), new PVector(newVelX, newVelY), newMass, newRadius, newCol));
           }
           planets.remove(i);
         }

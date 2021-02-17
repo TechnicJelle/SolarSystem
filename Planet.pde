@@ -13,7 +13,7 @@ class Planet {
 
   Planet(PVector p, PVector v, float m, float r, color c) {
     pos = p;
-    vel = v.mult(FAC_NEWP);
+    vel = v;
     acc = new PVector(0, 0);
     mass = m;
     radius = r;

@@ -95,7 +95,7 @@ void mouseReleased() {
     if (mouseButton == LEFT) {
       //Add Planet -->
       if (dist(newPlanetPos, sun) > SUN_RADIUS) { //Not in sun
-        planets.add(new Planet(newPlanetPos, newPlanetVel, newPlanetMass, newPlanetRadius, newPlanetColour));
+        planets.add(new Planet(newPlanetPos, PVector.mult(newPlanetVel, FAC_NEWP), newPlanetMass, newPlanetRadius, newPlanetColour));
       }
 
       if (!simRunning) {
@@ -316,6 +316,48 @@ void keyPressed() {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (!p.onScreen) {
+          planets.remove(i);
+        }
+      }
+      break;
+    case 'd': //destroy planet creating multiple smaller ones
+      for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
+          int pieces = (int)random(2, 9); //possible amounts of debris
+          float newMassTotal = 0;
+          float newAreaTotal = 0;
+          float[] newMasses = new float[pieces];
+          float[] newRadii = new float[pieces];
+          float[] newVelMags = new float[pieces];
+          PVector[] newVels = new PVector[pieces];
+          for (int j=0; j < pieces; j++) {
+            newMasses[j] = random(1.0, 100.0);
+            newMassTotal += newMasses[j];
+            newRadii[j] = random(1.0, 100.0);
+            newAreaTotal += sq(newRadii[j]);
+            newVelMags[j] = random(1.0, 10.0); //min and max explosion speed
+          }
+          float massFac = p.mass / newMassTotal;
+          float areaFac = sq(p.radius) / newAreaTotal;
+          newVels[pieces-1] = new PVector(0.0, 0.0);
+          for (int j=0; j < pieces; j++) {
+            newMasses[j] *= massFac;
+            newRadii[j] *= sqrt(areaFac);
+            if(pieces-1 != j) {
+              newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
+              newVels[pieces-1].sub(newVels[j]);
+            }
+            newVels[j].div(newMasses[j]);
+          }
+          for (int j=0; j < pieces; j++) {
+            PVector newVel = PVector.add(newVels[j], p.vel);
+            float spawningLimit = p.radius - newRadii[j];
+            PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
+            if(newRadii[j] >= MIN_PLANET_RADIUS/2) {
+              planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
+            }
+          }
           planets.remove(i);
         }
       }

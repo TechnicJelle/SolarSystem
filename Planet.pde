@@ -13,7 +13,7 @@ class Planet {
 
   Planet(PVector p, PVector v, float m, float r, color c) {
     pos = p;
-    vel = v.mult(FAC_NEWP);
+    vel = v;
     acc = new PVector(0, 0);
     mass = m;
     radius = r;
@@ -48,8 +48,8 @@ class Planet {
       system.beginShape();
       for (int i = 0; i < trail.size(); i++) {
         PVector pb = trail.get(i);
-        system.stroke(col, map(i, 0, trail.size(), 0, 255));
-        system.strokeWeight(map(i, 0, trail.size(), 0, 5));
+        system.stroke(col, map(i, 0, trail.size(), 0, 200));
+        system.strokeWeight(map(i, 0, trail.size(), 0, radius /3));
         system.curveVertex(pb.x, pb.y);
       }
       system.endShape();

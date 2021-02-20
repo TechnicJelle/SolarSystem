@@ -20,7 +20,7 @@ A simple solar system simulation environment where you can play around with plan
 `T` Turn Trail **On**/Off\
 `H` Turn Heading Line On/**Off**\
 `P` Turn Planet Properties Text On/**Off**\
-`C` Turn Colour Picker Bar **On**/Off\
+`U` Turn all UI **On**/Off\
 `Q` **High**/Low Quality Trails\
 `D` Destroy a Planet (Split it into multiple pieces)\
 `X` Remove a Planet (Hover over it with your cursor)\

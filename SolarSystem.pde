@@ -125,7 +125,8 @@ void draw() {
     for (int t = 0; t < timeStepsPerFrame; t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
-        if (dist(p.pos, sun) < p.radius + SUN_RADIUS)
+        if (dist(p.pos, sun) < p.radius + SUN_RADIUS) || 
+        p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
         p.applyForce(attractMass(p));

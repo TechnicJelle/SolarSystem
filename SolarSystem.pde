@@ -47,7 +47,7 @@ boolean trailHQ = true;
 boolean simRunning = true;
 boolean showHeadingLine = false;
 boolean showProperties = false;
-boolean showColourBar = true;
+boolean showUI = true;
 
 float mouseSize = 32;
 PVector[] mouse = {new PVector(0, 0), new PVector(0, 1), new PVector(0.225, 0.839711), new PVector(0.5, 0.866025)};
@@ -96,7 +96,7 @@ void mouseReleased() {
   if (newPlanetPos.y < barPos) {
     if (mouseButton == LEFT) {
       //Add Planet -->
-      if (dist(newPlanetPos, sun) > SUN_RADIUS) { //Not in sun
+      if (dist(newPlanetPos, sun) > SUN_RADIUS && showUI) { //Not in sun & UI is on
         planets.add(new Planet(newPlanetPos, PVector.mult(newPlanetVel, FAC_NEWP), newPlanetMass, newPlanetRadius, newPlanetColour));
       }
 
@@ -122,7 +122,7 @@ void draw() {
   system.colorMode(HSB);
   system.background(170, 100, 5);
 
-  //Planets -->
+  //Planet physics -->
   if (!mousePressed && simRunning && !simHalted) {
     for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
@@ -142,113 +142,114 @@ void draw() {
   system.fill(32, 255, 255);
   system.circle(sun.x, sun.y, SUN_RADIUS *2);
 
+  if (showUI) {
+    if (frameCount > 1)
+      gizmos.clear();
+    gizmos.beginDraw();
+    gizmos.colorMode(HSB);
 
-  if (frameCount > 1)
-    gizmos.clear();
-  gizmos.beginDraw();
-  gizmos.colorMode(HSB);
-
-  gizmos.noStroke();
-  gizmos.fill(255);
-  gizmos.textSize(TEXT_SIZE);
-  gizmos.textLeading(TEXT_SIZE);
-
-  if (facSimSpeedMod != 1.0) {
-    gizmos.textAlign(RIGHT, TOP);
-    gizmos.text("x" + nfc(facSimSpeedMod, 1), width, 0);
-  }
-
-
-
-  if (showProperties) {
-    gizmos.textAlign(CENTER, CENTER);
+    gizmos.noStroke();
+    gizmos.fill(255);
+    gizmos.textSize(TEXT_SIZE);
     gizmos.textLeading(TEXT_SIZE);
-    gizmos.text("m:" + SUN_MASS + "\nr:" + SUN_RADIUS, sun.x, sun.y);
   }
 
   for (Planet p : planets) //Planets contain both system and gizmos graphics
     p.render();
   system.endDraw();
 
-  //Mass Changer Gizmo Pop-Up -->
-  if (millis() - startMassChangeTime > 1000) //Hide again after a second
-    showingNewMass = false;
-  if (showingNewMass) {
-    gizmos.textAlign(LEFT, BOTTOM);
-    gizmos.text("m:" + round(newPlanetMass), mouseX, mouseY);
-  }
+  if (showUI) {
+    if (facSimSpeedMod != 1.0) {
+      gizmos.textAlign(RIGHT, TOP);
+      gizmos.text("x" + nfc(facSimSpeedMod, 1), width, 0);
+    }
 
-  //Mouse Actions -->
-  if (mousePressed) {
-    if (newPlanetPos.y < barPos) {
-      gizmos.stroke(255);
-      gizmos.strokeWeight(3);
-      gizmos.noFill();
-      switch(mouseButton) {
-      case RIGHT: //Size Graphic
-        newPlanetRadius = constrain(dist(newPlanetPos.x, newPlanetPos.y, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
-        gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
-        if (showProperties) {
-          gizmos.textAlign(LEFT, BOTTOM);
-          gizmos.text(nfc(newPlanetRadius, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
-        }
-        break;
-      case LEFT: //Catapult Graphic
-        if (dist(newPlanetPos, sun) > SUN_RADIUS) {
-          //Relative End Coordinates -->
-          newPlanetVel = PVector.sub(newPlanetPos, new PVector(mouseX, mouseY));
+    if (showProperties) {
+      gizmos.textAlign(CENTER, CENTER);
+      gizmos.textLeading(TEXT_SIZE);
+      gizmos.text("m:" + SUN_MASS + "\nr:" + SUN_RADIUS, sun.x, sun.y);
+    }
+
+    //Mass Changer Gizmo Pop-Up -->
+    if (millis() - startMassChangeTime > 1000) //Hide again after a second
+      showingNewMass = false;
+    if (showingNewMass) {
+      gizmos.textAlign(LEFT, BOTTOM);
+      gizmos.text("m:" + round(newPlanetMass), mouseX, mouseY);
+    }
+
+    //Mouse Actions -->
+    if (mousePressed) {
+      if (newPlanetPos.y < barPos) {
+        gizmos.stroke(255);
+        gizmos.strokeWeight(3);
+        gizmos.noFill();
+        switch(mouseButton) {
+        case RIGHT: //Size Graphic
+          newPlanetRadius = constrain(dist(newPlanetPos.x, newPlanetPos.y, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
           gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
-          gizmos.strokeCap(ROUND);
-          gizmos.line(newPlanetPos.x, newPlanetPos.y, newPlanetPos.x + FAC_NEWP*(newPlanetPos.x - mouseX), newPlanetPos.y + FAC_NEWP*(newPlanetPos.y - mouseY));
           if (showProperties) {
             gizmos.textAlign(LEFT, BOTTOM);
-            gizmos.text(nfc(newPlanetVel.mag()*FAC_NEWP, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
+            gizmos.text(nfc(newPlanetRadius, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
           }
+          break;
+        case LEFT: //Catapult Graphic
+          if (dist(newPlanetPos, sun) > SUN_RADIUS) {
+            //Relative End Coordinates -->
+            newPlanetVel = PVector.sub(newPlanetPos, new PVector(mouseX, mouseY));
+            gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
+            gizmos.strokeCap(ROUND);
+            gizmos.line(newPlanetPos.x, newPlanetPos.y, newPlanetPos.x + FAC_NEWP*(newPlanetPos.x - mouseX), newPlanetPos.y + FAC_NEWP*(newPlanetPos.y - mouseY));
+            if (showProperties) {
+              gizmos.textAlign(LEFT, BOTTOM);
+              gizmos.text(nfc(newPlanetVel.mag()*FAC_NEWP, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
+            }
+          }
+          break;
         }
-        break;
+      } else if (newPlanetPos.y > barPos && mouseX < wd3csw && showUI) {
+        //Colour Picker Pop-Up
+        newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
+        updateNewPlanetColour();
+        gizmos.stroke(newPlanetColour);
+        gizmos.strokeWeight(10);
+        gizmos.fill(color(newPlanetHue, 255, 255));
+        gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
       }
-    } else if (newPlanetPos.y > barPos && mouseX < wd3csw && showColourBar) {
-      //Colour Picker Pop-Up
-      newPlanetHue = map(mouseX, 0, wd3csw, 0, 255);
-      updateNewPlanetColour();
-      gizmos.stroke(newPlanetColour);
-      gizmos.strokeWeight(10);
-      gizmos.fill(color(newPlanetHue, 255, 255));
-      gizmos.rect(mouseX, barPos - 32, width/10, -width/10, 20);
     }
-  }
 
-  //Colour Picker Bar -->
-  if (showColourBar) {
+    //Colour Picker Bar -->
     gizmos.strokeWeight(colSegWidth);
     gizmos.strokeCap(SQUARE);
     for (float i = 0; i < wd3+1; i+=colSegWidth) {
       gizmos.stroke(map(i, 0, wd3, 0, 255), 255, 255, 200);
       gizmos.line(i + colSegWidth/2, barPos, i + colSegWidth/2, height);
     }
+
+    //Custom Cursor -->
+    gizmos.pushMatrix();
+    gizmos.translate(mouseX, mouseY);
+    gizmos.fill(newPlanetColour, 128);
+    gizmos.stroke(255, 128);
+    gizmos.strokeWeight(3);
+    gizmos.beginShape();
+    for (PVector p : mouse)
+      gizmos.vertex(p.x, p.y);
+    gizmos.endShape(CLOSE);
+    gizmos.stroke(255, 200);
+    gizmos.strokeWeight(1);
+    gizmos.beginShape();
+    for (PVector p : mouse)
+      gizmos.vertex(p.x, p.y);
+    gizmos.endShape(CLOSE);
+    gizmos.popMatrix();
+
+    gizmos.endDraw();
   }
 
-  //Custom Cursor -->
-  gizmos.pushMatrix();
-  gizmos.translate(mouseX, mouseY);
-  gizmos.fill(newPlanetColour, 128);
-  gizmos.stroke(255, 128);
-  gizmos.strokeWeight(3);
-  gizmos.beginShape();
-  for (PVector p : mouse)
-    gizmos.vertex(p.x, p.y);
-  gizmos.endShape(CLOSE);
-  gizmos.stroke(255, 200);
-  gizmos.strokeWeight(1);
-  gizmos.beginShape();
-  for (PVector p : mouse)
-    gizmos.vertex(p.x, p.y);
-  gizmos.endShape(CLOSE);
-  gizmos.popMatrix();
-
-  gizmos.endDraw();
   image(system, 0, 0);
-  image(gizmos, 0, 0);
+  if (showUI)
+    image(gizmos, 0, 0);
 }
 
 PVector attract(Planet p) {
@@ -316,9 +317,9 @@ void keyPressed() {
     case 'P':
       showProperties = !showProperties;
       break;
-    case 'c':
-    case 'C':
-      showColourBar = !showColourBar;
+    case 'u':
+    case 'U':
+      showUI = !showUI;
       break;
     case 'q':
     case 'Q':

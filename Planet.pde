@@ -61,18 +61,20 @@ class Planet {
       system.fill(col);
       system.circle(pos.x, pos.y, radius *2);
 
-      //Heading Vector Line -->
-      if (showHeadingLine) {
-        gizmos.stroke(255);
-        gizmos.strokeWeight(3);
-        gizmos.strokeCap(ROUND);
-        gizmos.line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
-      }
+      if (showUI) {
+        //Heading Vector Line -->
+        if (showHeadingLine) {
+          gizmos.stroke(255);
+          gizmos.strokeWeight(3);
+          gizmos.strokeCap(ROUND);
+          gizmos.line(pos.x, pos.y, pos.x + vel.x, pos.y + vel.y);
+        }
 
-      //Velocity Text -->
-      if (showProperties) {
-        gizmos.textAlign(LEFT, BOTTOM);
-        gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1) + "\nr:" + nfc(radius, 1), pos.x, pos.y);
+        //Velocity Text -->
+        if (showProperties) {
+          gizmos.textAlign(LEFT, BOTTOM);
+          gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1) + "\nr:" + nfc(radius, 1), pos.x, pos.y);
+        }
       }
     }
   }

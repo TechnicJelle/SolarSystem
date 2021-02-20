@@ -15,7 +15,9 @@ final float FAC_NEWP = 0.1;
 
 final float TEXT_SIZE = 20;
 
-final int timeStepsPerFrame = 10;
+final int TIMESTEPS_PER_FRAME = 10;
+final int FAC_FASTFORWARD = 2; //2x faster
+final int FAC_SLOWMOTION  = 2; //2x slower
 
 float newPlanetMass;
 float newPlanetRadius;
@@ -34,8 +36,10 @@ float colSegWidth;
 float wd3csw;
 
 boolean simHalted = false;
+boolean simFastForward = false;
+boolean simSlowMotion = false;
 
-final int alternateButton = SHIFT; //ALT, because alternate
+final int alternateButton = SHIFT; //could also use ALT, because alternate
 boolean alternateAction = false;
 
 //Settings -->
@@ -122,22 +126,27 @@ void draw() {
 
   //Planets -->
   if (!mousePressed && simRunning && !simHalted) {
-    for (int t = 0; t < timeStepsPerFrame; t++) {
+    for (int t = 0; t < TIMESTEPS_PER_FRAME * (simFastForward ? FAC_FASTFORWARD : 1) / (simSlowMotion ? FAC_SLOWMOTION : 1); t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
-        if (dist(p.pos, sun) < p.radius + SUN_RADIUS) || 
-        p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
+        if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
+          p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
         p.applyForce(attractMass(p));
-        p.update(1/float(timeStepsPerFrame));
+        p.update(1/float(TIMESTEPS_PER_FRAME));
       }
     }
   }
 
   //Sun -->
   system.noStroke();
-  system.fill(32, 255, 255);
+  if (simSlowMotion)
+    system.fill(0, 255, 255);
+  else if (simFastForward)
+    system.fill(80, 255, 255);
+  else
+    system.fill(32, 255, 255);
   system.circle(sun.x, sun.y, SUN_RADIUS *2);
 
 
@@ -291,21 +300,27 @@ void keyPressed() {
       simRunning = !simRunning;
       break;
     case 't':
+    case 'T':
       trailTracking = !trailTracking;
       break;
     case 'h':
+    case 'H':
       showHeadingLine = !showHeadingLine;
       break;
     case 'p':
+    case 'P':
       showProperties = !showProperties;
       break;
     case 'c':
+    case 'C':
       showColourBar = !showColourBar;
       break;
     case 'q':
+    case 'Q':
       trailHQ = !trailHQ;
       break;
     case 'x': //remove a hovered over planet
+    case 'X':
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
@@ -314,6 +329,7 @@ void keyPressed() {
       }
       break;
     case 'z': //remove offscreen planets
+    case 'Z':
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (!p.onScreen) {
@@ -322,6 +338,7 @@ void keyPressed() {
       }
       break;
     case 'd': //destroy planet creating multiple smaller ones
+    case 'D':
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
@@ -371,6 +388,13 @@ void keyPressed() {
       else
         system.save(screenshotName);
       break;
+    case 'f':
+    case 'F':
+      if (alternateAction)
+        simSlowMotion = true;
+      else
+        simFastForward = true;
+      break;
     }
   }
 }
@@ -380,10 +404,20 @@ void keyReleased() {
     switch(keyCode) {
     case alternateButton:
       alternateAction = false;
+
       break;
     }
+    simFastForward = false;
+    simSlowMotion = false;
   } else {
     switch(key) {
+    case 'f':
+    case 'F':
+      if (alternateAction)
+        simSlowMotion = false;
+      else
+        simFastForward = false;
+      break;
     }
   }
 }

@@ -16,8 +16,8 @@ final float FAC_NEWP = 0.1;
 final float TEXT_SIZE = 20;
 
 final int TIMESTEPS_PER_FRAME = 10;
-final int FAC_FASTFORWARD = 2; //2x faster
-final int FAC_SLOWMOTION  = 2; //2x slower
+final float FAC_FASTFORWARD = 2.0; //2x faster
+final float FAC_SLOWMOTION  = 0.5; //2x slower
 
 float newPlanetMass;
 float newPlanetRadius;
@@ -36,8 +36,7 @@ float colSegWidth;
 float wd3csw;
 
 boolean simHalted = false;
-boolean simFastForward = false;
-boolean simSlowMotion = false;
+boolean simSpeedMod = false;
 
 final int alternateButton = SHIFT; //could also use ALT, because alternate
 boolean alternateAction = false;
@@ -126,7 +125,7 @@ void draw() {
 
   //Planets -->
   if (!mousePressed && simRunning && !simHalted) {
-    for (int t = 0; t < TIMESTEPS_PER_FRAME * (simFastForward ? FAC_FASTFORWARD : 1) / (simSlowMotion ? FAC_SLOWMOTION : 1); t++) {
+    for (int t = 0; t < TIMESTEPS_PER_FRAME * (simSpeedMod ? (alternateAction ? FAC_SLOWMOTION : FAC_FASTFORWARD) : 1); t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
@@ -141,11 +140,12 @@ void draw() {
 
   //Sun -->
   system.noStroke();
-  if (simSlowMotion)
-    system.fill(0, 255, 255);
-  else if (simFastForward)
-    system.fill(80, 255, 255);
-  else
+  if (simSpeedMod) {
+    if (alternateAction)
+      system.fill(0, 255, 255);
+    else
+      system.fill(80, 255, 255);
+  } else
     system.fill(32, 255, 255);
   system.circle(sun.x, sun.y, SUN_RADIUS *2);
 
@@ -390,10 +390,7 @@ void keyPressed() {
       break;
     case 'f':
     case 'F':
-      if (alternateAction)
-        simSlowMotion = true;
-      else
-        simFastForward = true;
+      simSpeedMod = true;
       break;
     }
   }
@@ -407,16 +404,12 @@ void keyReleased() {
 
       break;
     }
-    simFastForward = false;
-    simSlowMotion = false;
+    simSpeedMod = false;
   } else {
     switch(key) {
     case 'f':
     case 'F':
-      if (alternateAction)
-        simSlowMotion = false;
-      else
-        simFastForward = false;
+      simSpeedMod = false;
       break;
     }
   }

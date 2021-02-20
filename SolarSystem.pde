@@ -15,9 +15,9 @@ final float FAC_NEWP = 0.1;
 
 final float TEXT_SIZE = 20;
 
+final int TRAIL_LENGTH = 100;
+
 final int TIMESTEPS_PER_FRAME = 10;
-final float FAC_FASTFORWARD = 2.0; //2x faster
-final float FAC_SLOWMOTION  = 0.5; //2x slower
 
 float newPlanetMass;
 float newPlanetRadius;
@@ -36,13 +36,12 @@ float colSegWidth;
 float wd3csw;
 
 boolean simHalted = false;
-boolean simSpeedMod = false;
 
 final int alternateButton = SHIFT; //could also use ALT, because alternate
 boolean alternateAction = false;
 
 //Settings -->
-int trailLength = 100;
+float facSimSpeedMod = 1.0;
 boolean trailTracking = true;
 boolean trailHQ = true;
 boolean simRunning = true;
@@ -125,7 +124,7 @@ void draw() {
 
   //Planets -->
   if (!mousePressed && simRunning && !simHalted) {
-    for (int t = 0; t < TIMESTEPS_PER_FRAME * (simSpeedMod ? (alternateAction ? FAC_SLOWMOTION : FAC_FASTFORWARD) : 1); t++) {
+    for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
@@ -140,13 +139,7 @@ void draw() {
 
   //Sun -->
   system.noStroke();
-  if (simSpeedMod) {
-    if (alternateAction)
-      system.fill(0, 255, 255);
-    else
-      system.fill(80, 255, 255);
-  } else
-    system.fill(32, 255, 255);
+  system.fill(32, 255, 255);
   system.circle(sun.x, sun.y, SUN_RADIUS *2);
 
 
@@ -155,10 +148,19 @@ void draw() {
   gizmos.beginDraw();
   gizmos.colorMode(HSB);
 
+  gizmos.noStroke();
+  gizmos.fill(255);
+  gizmos.textSize(TEXT_SIZE);
+  gizmos.textLeading(TEXT_SIZE);
+
+  if (facSimSpeedMod != 1.0) {
+    gizmos.textAlign(RIGHT, TOP);
+    gizmos.text("x" + nfc(facSimSpeedMod, 1), width, 0);
+  }
+
+
+
   if (showProperties) {
-    gizmos.noStroke();
-    gizmos.fill(255);
-    gizmos.textSize(TEXT_SIZE);
     gizmos.textAlign(CENTER, CENTER);
     gizmos.textLeading(TEXT_SIZE);
     gizmos.text("m:" + SUN_MASS + "\nr:" + SUN_RADIUS, sun.x, sun.y);
@@ -172,9 +174,6 @@ void draw() {
   if (millis() - startMassChangeTime > 1000) //Hide again after a second
     showingNewMass = false;
   if (showingNewMass) {
-    gizmos.noStroke();
-    gizmos.fill(255);
-    gizmos.textSize(TEXT_SIZE);
     gizmos.textAlign(LEFT, BOTTOM);
     gizmos.text("m:" + round(newPlanetMass), mouseX, mouseY);
   }
@@ -190,9 +189,6 @@ void draw() {
         newPlanetRadius = constrain(dist(newPlanetPos.x, newPlanetPos.y, mouseX, mouseY) / (alternateAction ? 8 : 1), MIN_PLANET_RADIUS, MAX_PLANET_RADIUS);
         gizmos.circle(newPlanetPos.x, newPlanetPos.y, newPlanetRadius *2);
         if (showProperties) {
-          gizmos.noStroke();
-          gizmos.fill(255);
-          gizmos.textSize(TEXT_SIZE);
           gizmos.textAlign(LEFT, BOTTOM);
           gizmos.text(nfc(newPlanetRadius, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
         }
@@ -205,9 +201,6 @@ void draw() {
           gizmos.strokeCap(ROUND);
           gizmos.line(newPlanetPos.x, newPlanetPos.y, newPlanetPos.x + FAC_NEWP*(newPlanetPos.x - mouseX), newPlanetPos.y + FAC_NEWP*(newPlanetPos.y - mouseY));
           if (showProperties) {
-            gizmos.noStroke();
-            gizmos.fill(255);
-            gizmos.textSize(TEXT_SIZE);
             gizmos.textAlign(LEFT, BOTTOM);
             gizmos.text(nfc(newPlanetVel.mag()*FAC_NEWP, 1), newPlanetPos.x + newPlanetRadius *.7, newPlanetPos.y - newPlanetRadius *.7);
           }
@@ -296,6 +289,18 @@ void keyPressed() {
     }
   } else {
     switch(key) {
+    case '+':
+      if (alternateAction)
+        facSimSpeedMod = constrain(facSimSpeedMod + 0.1, 0.1, 5);
+      else
+        facSimSpeedMod = constrain(facSimSpeedMod + 0.5, 0.5, 5);
+      break;
+    case '-':
+      if (alternateAction)
+        facSimSpeedMod = constrain(facSimSpeedMod - 0.1, 0.1, 5);
+      else
+        facSimSpeedMod = constrain(facSimSpeedMod - 0.5, 0.5, 5);
+      break;
     case ' ':
       simRunning = !simRunning;
       break;
@@ -388,10 +393,6 @@ void keyPressed() {
       else
         system.save(screenshotName);
       break;
-    case 'f':
-    case 'F':
-      simSpeedMod = true;
-      break;
     }
   }
 }
@@ -404,13 +405,8 @@ void keyReleased() {
 
       break;
     }
-    simSpeedMod = false;
   } else {
     switch(key) {
-    case 'f':
-    case 'F':
-      simSpeedMod = false;
-      break;
     }
   }
 }

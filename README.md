@@ -13,6 +13,10 @@ A simple solar system simulation environment where you can play around with plan
 `Scroll` Change the mass for new Planets\
 `Shift` + `Scroll` Change the mass faster\
 `Space` **Play**/Pause the simulation\
+`+` Speed up the simulation by 0.5x\
+`Shift` + `+` Speed up the simulation by 0.1x\
+`-` Slow down the simulation by 0.5x\
+`Shift` + `-` Slow down the simulation by 0.1x\
 `T` Turn Trail **On**/Off\
 `H` Turn Heading Line On/**Off**\
 `P` Turn Planet Properties Text On/**Off**\

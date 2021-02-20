@@ -19,7 +19,7 @@ class Planet {
     radius = r;
     col = c;
     trail = new ArrayList<PVector>();
-    for (int i = 0; i < trailLength; i++) {
+    for (int i = 0; i < TRAIL_LENGTH; i++) {
       trail.add(pos.copy());
     }
   }
@@ -71,11 +71,7 @@ class Planet {
 
       //Velocity Text -->
       if (showProperties) {
-        gizmos.noStroke();
-        gizmos.fill(255);
-        gizmos.textSize(TEXT_SIZE);
         gizmos.textAlign(LEFT, BOTTOM);
-        gizmos.textLeading(TEXT_SIZE);
         gizmos.text("v:" + nfc(vel.mag(), 1) + "\nm:" + nfc(mass, 1) + "\nr:" + nfc(radius, 1), pos.x, pos.y);
       }
     }
@@ -111,7 +107,7 @@ class Planet {
       }
 
       //Trail Cleanup -->
-      while (trail.size() > trailLength) {
+      while (trail.size() > TRAIL_LENGTH) {
         trail.remove(0);
       }
     }

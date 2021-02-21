@@ -159,7 +159,9 @@ void draw() {
   system.endDraw();
 
   if (showUI) {
-    if (facSimSpeedMod != 1.0) {
+    if (facSimSpeedMod > 0.96 && facSimSpeedMod < 1.04) {
+      facSimSpeedMod = 1.0;
+    } else {
       gizmos.textAlign(RIGHT, TOP);
       gizmos.text("x" + nfc(facSimSpeedMod, 1), width, 0);
     }
@@ -290,6 +292,7 @@ void keyPressed() {
     }
   } else {
     switch(key) {
+    case '=':
     case '+':
       if (alternateAction)
         facSimSpeedMod = constrain(facSimSpeedMod + 0.1, 0.1, 5);
@@ -297,6 +300,7 @@ void keyPressed() {
         facSimSpeedMod = constrain(facSimSpeedMod + 0.5, 0.5, 5);
       break;
     case '-':
+    case '_':
       if (alternateAction)
         facSimSpeedMod = constrain(facSimSpeedMod - 0.1, 0.1, 5);
       else

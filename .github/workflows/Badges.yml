@@ -1,0 +1,32 @@
+on: [push, workflow_dispatch]
+name: Badges
+
+jobs:
+  lines_of_code:
+    runs-on: ubuntu-latest
+    name: Lines of Code
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Make LoC Badge
+        uses: shadowmoose/GHA-LoC-Badge@1.0.0
+        id: badge
+        with:
+          debug: true
+          directory: ./
+          badge: ./output/badgelines.svg
+          patterns: '*.pde'
+
+      - name: Print the output
+        run: |
+          echo "Scanned: ${{ steps.badge.outputs.counted_files }}";
+          echo "Line Count: ${{ steps.badge.outputs.total_lines }}";
+      - name: Deploy to badges branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./output
+          publish_branch: badges
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'

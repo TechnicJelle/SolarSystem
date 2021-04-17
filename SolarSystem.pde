@@ -135,7 +135,6 @@ void draw() {
         //roche limit
         if (dist(p.pos, sun) < 2.456 * p.radius * pow((SUN_MASS / (SUN_RADIUS * SUN_RADIUS * SUN_RADIUS)) / (p.mass / (p.radius * p.radius * p.radius)), (1 / 3))) {
           explode(p, i);
-          println("i did a thing");
         }       
         p.applyForce(attractMass(p));
         p.update(1/float(TIMESTEPS_PER_FRAME));

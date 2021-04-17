@@ -127,10 +127,15 @@ void draw() {
     for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
+
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
           p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
+        //roche limit
+        if (dist(p.pos, sun) < 2.456 * p.radius * pow((SUN_MASS / (SUN_RADIUS * SUN_RADIUS * SUN_RADIUS)) / (p.mass / (p.radius * p.radius * p.radius)), (1 / 3))) {
+          explode(p, i);
+        }       
         p.applyForce(attractMass(p));
         p.update(1/float(TIMESTEPS_PER_FRAME));
       }
@@ -270,6 +275,44 @@ PVector attractMass(Planet p) {
   return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
 }
 
+void explode(Planet p, int i) {
+  int pieces = (int)random(2, 9); //possible amounts of debris
+  float newMassTotal = 0;
+  float newAreaTotal = 0;
+  float[] newMasses = new float[pieces];
+  float[] newRadii = new float[pieces];
+  float[] newVelMags = new float[pieces];
+  PVector[] newVels = new PVector[pieces];
+  for (int j=0; j < pieces; j++) {
+    newMasses[j] = random(1.0, 100.0);
+    newMassTotal += newMasses[j];
+    newRadii[j] = random(1.0, 100.0);
+    newAreaTotal += sq(newRadii[j]);
+    newVelMags[j] = random(1.0, 10.0); //min and max explosion speed
+  }
+  float massFac = p.mass / newMassTotal;
+  float areaFac = sq(p.radius) / newAreaTotal;
+  newVels[pieces-1] = new PVector(0.0, 0.0);
+  for (int j=0; j < pieces; j++) {
+    newMasses[j] *= massFac;
+    newRadii[j] *= sqrt(areaFac);
+    if (pieces-1 != j) {
+      newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
+      newVels[pieces-1].sub(newVels[j]);
+    }
+    newVels[j].div(newMasses[j]);
+  }
+  for (int j=0; j < pieces; j++) {
+    PVector newVel = PVector.add(PVector.mult(newVels[j], 0.5), p.vel);
+    float spawningLimit = p.radius - newRadii[j];
+    PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
+    if (newRadii[j] >= MIN_PLANET_RADIUS/2) {
+      planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
+    }
+  }
+  planets.remove(i);
+}
+
 void updateNewPlanetColour() {
   newPlanetColour = colourFromMass(newPlanetHue, newPlanetMass);
 }
@@ -352,41 +395,7 @@ void keyPressed() {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
-          int pieces = (int)random(2, 9); //possible amounts of debris
-          float newMassTotal = 0;
-          float newAreaTotal = 0;
-          float[] newMasses = new float[pieces];
-          float[] newRadii = new float[pieces];
-          float[] newVelMags = new float[pieces];
-          PVector[] newVels = new PVector[pieces];
-          for (int j=0; j < pieces; j++) {
-            newMasses[j] = random(1.0, 100.0);
-            newMassTotal += newMasses[j];
-            newRadii[j] = random(1.0, 100.0);
-            newAreaTotal += sq(newRadii[j]);
-            newVelMags[j] = random(1.0, 10.0); //min and max explosion speed
-          }
-          float massFac = p.mass / newMassTotal;
-          float areaFac = sq(p.radius) / newAreaTotal;
-          newVels[pieces-1] = new PVector(0.0, 0.0);
-          for (int j=0; j < pieces; j++) {
-            newMasses[j] *= massFac;
-            newRadii[j] *= sqrt(areaFac);
-            if (pieces-1 != j) {
-              newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
-              newVels[pieces-1].sub(newVels[j]);
-            }
-            newVels[j].div(newMasses[j]);
-          }
-          for (int j=0; j < pieces; j++) {
-            PVector newVel = PVector.add(PVector.mult(newVels[j], 0.5), p.vel);
-            float spawningLimit = p.radius - newRadii[j];
-            PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
-            if (newRadii[j] >= MIN_PLANET_RADIUS/2) {
-              planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
-            }
-          }
-          planets.remove(i);
+          explode(p, i);
         }
       }
       break;

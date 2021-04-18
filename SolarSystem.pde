@@ -132,8 +132,8 @@ void draw() {
           p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
-        //roche limit
-        if (dist(p.pos, sun) < 2.456 * p.radius * pow((SUN_MASS / (SUN_RADIUS * SUN_RADIUS * SUN_RADIUS)) / (p.mass / (p.radius * p.radius * p.radius)), (1 / 3))) {
+        //updated roche limit
+        if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0))) {
           explode(p, i);
         }       
         p.applyForce(attractMass(p));

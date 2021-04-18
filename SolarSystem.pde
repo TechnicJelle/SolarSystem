@@ -279,6 +279,7 @@ void explode(Planet p, int i) {
   int pieces = (int)random(2, 9); //possible amounts of debris
   float newMassTotal = 0;
   float newAreaTotal = 0;
+  PVector totalError = new PVector();
   float[] newMasses = new float[pieces];
   float[] newRadii = new float[pieces];
   float[] newVelMags = new float[pieces];
@@ -296,11 +297,13 @@ void explode(Planet p, int i) {
   for (int j=0; j < pieces; j++) {
     newMasses[j] *= massFac;
     newRadii[j] *= sqrt(areaFac);
-    if (pieces-1 != j) {
-      newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
-      newVels[pieces-1].sub(newVels[j]);
-    }
+    newVels[j] = PVector.random2D().normalize().mult(newMasses[j] * newVelMags[j]);
+    totalError.sub(newVels[j]);
     newVels[j].div(newMasses[j]);
+  }
+  
+  for (int j=0; j < pieces; j++) {
+    newVels[j].sub(PVector.div(totalError, newMasses[j] * (pieces + 1)));
   }
   for (int j=0; j < pieces; j++) {
     PVector newVel = PVector.add(PVector.mult(newVels[j], 0.5), p.vel);

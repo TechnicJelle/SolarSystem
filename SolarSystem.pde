@@ -310,7 +310,9 @@ void explode(Planet p, int i) {
       planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
     }
   }
-  planets.remove(i);
+  if(i < planets.size()) {
+    planets.remove(i);
+  }
 }
 
 void updateNewPlanetColour() {

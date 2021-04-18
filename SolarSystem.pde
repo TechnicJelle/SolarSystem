@@ -297,7 +297,7 @@ void explode(Planet p, int i) {
   for (int j=0; j < pieces; j++) {
     newMasses[j] *= massFac;
     newRadii[j] *= sqrt(areaFac);
-    newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
+    newVels[j] = PVector.random2D().normalize().mult(newMasses[j] * newVelMags[j]);
     totalError.sub(newVels[j]);
     newVels[j].div(newMasses[j]);
   }

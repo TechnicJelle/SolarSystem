@@ -125,32 +125,25 @@ void draw() {
   //Planet physics -->
   if (!mousePressed && simRunning && !simHalted) {
     for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
-      for (int i = planets.size() - 1; i >= 0; i--) {
+      for (int i = planets.size() - 1; i >= 0; i--) {    
         Planet p = planets.get(i);
 
-        if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
-          p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
+        if (dist(p.pos, sun) < p.radius + SUN_RADIUS || p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
-        //updated roche limit
+        //roche limit
         if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0))) {
-          explode(p, i);
-        }       
+          explode(p, i, planets);
+        }         
         p.applyForce(attractMass(p));
-        
+
         for (int z = planets.size() - 1; z >= 0; z--) {
           if (z != i) {
             p.applyForce(attractMass(p, planets.get(z)));
-            if (dist(p.pos, planets.get(z).pos) < 2 * p.radius) {                
-              p.vel.div(planets.get(z).mass / 10);
-              p.radius /= 2;
-              p.mass /= 2;
-              planets.remove(z);              
-            }
           }
-        }
+        }        
         p.update(1/float(TIMESTEPS_PER_FRAME));
-      }
+      }      
     }
   }
 
@@ -290,13 +283,9 @@ PVector attractMass(Planet p) {
 PVector attractMass(Planet p, Planet o) {
   float d = dist(p.pos, o.pos);
   float m = o.mass * p.mass;
-  if (d > p.radius) {
-    float rsq = sq(dist(o.pos, p.pos));
-    float q = m/rsq;
-    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
-  } else if (d > p.radius / 2) {
-    float rsq = pow(dist(o.pos, p.pos), 4);
-    float q = m/rsq;
+  float rsq = sq(dist(o.pos, p.pos));
+  float q = m/rsq;
+  if (d > p.radius + o.radius) {    
     return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
   } else {
     return new PVector(0, 0);
@@ -307,7 +296,7 @@ boolean roche(Planet p, Planet M) {
   return dist(p.pos, M.pos) < 2.456 * M.radius * pow((M.mass / (M.radius * M.radius * M.radius)) / (p.mass / (p.radius * p.radius * p.radius)), (1.0 / 3.0));
 }
 
-void explode(Planet p, int i) {
+void explode(Planet p, int i, ArrayList<Planet> q) {
   int pieces = (int)random(2, 9); //possible amounts of debris
   float newMassTotal = 0;
   float newAreaTotal = 0;
@@ -329,11 +318,11 @@ void explode(Planet p, int i) {
   for (int j=0; j < pieces; j++) {
     newMasses[j] *= massFac;
     newRadii[j] *= sqrt(areaFac);
-    newVels[j] = PVector.random2D().normalize().mult(newMasses[j] * newVelMags[j]);
+    newVels[j] = PVector.random2D().mult(newMasses[j] * newVelMags[j]);
     totalError.sub(newVels[j]);
     newVels[j].div(newMasses[j]);
   }
-  
+
   for (int j=0; j < pieces; j++) {
     newVels[j].sub(PVector.div(totalError, newMasses[j] * (pieces + 1)));
   }
@@ -342,13 +331,16 @@ void explode(Planet p, int i) {
     float spawningLimit = p.radius - newRadii[j];
     PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
     if (newRadii[j] >= MIN_PLANET_RADIUS/2) {
-      planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
+      q.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
     }
   }
-  if(i < planets.size()) {
-    planets.remove(i);
+  
+  if (i < q.size()) {
+    q.remove(i);
   }
 }
+
+
 
 void updateNewPlanetColour() {
   newPlanetColour = colourFromMass(newPlanetHue, newPlanetMass);
@@ -432,7 +424,7 @@ void keyPressed() {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
-          explode(p, i);
+          explode(p, i, planets);
         }
       }
       break;

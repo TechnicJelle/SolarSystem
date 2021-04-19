@@ -137,6 +137,18 @@ void draw() {
           explode(p, i);
         }       
         p.applyForce(attractMass(p));
+        
+        for (int z = planets.size() - 1; z >= 0; z--) {
+          if (z != i) {
+            p.applyForce(attractMass(p, planets.get(z)));
+            if (dist(p.pos, planets.get(z).pos) < 2 * p.radius) {                
+              p.vel.div(planets.get(z).mass / 10);
+              p.radius /= 2;
+              p.mass /= 2;
+              planets.remove(z);              
+            }
+          }
+        }
         p.update(1/float(TIMESTEPS_PER_FRAME));
       }
     }
@@ -273,6 +285,22 @@ PVector attractMass(Planet p) {
   float rsq = sq(dist(sun, p.pos));
   float q = m/rsq;
   return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
+}
+
+PVector attractMass(Planet p, Planet o) {
+  float d = dist(p.pos, o.pos);
+  float m = o.mass * p.mass;
+  if (d > p.radius) {
+    float rsq = sq(dist(o.pos, p.pos));
+    float q = m/rsq;
+    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
+  } else if (d > p.radius / 2) {
+    float rsq = pow(dist(o.pos, p.pos), 4);
+    float q = m/rsq;
+    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
+  } else {
+    return new PVector(0, 0);
+  }
 }
 
 void explode(Planet p, int i) {

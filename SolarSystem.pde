@@ -303,6 +303,10 @@ PVector attractMass(Planet p, Planet o) {
   }
 }
 
+boolean roche(Planet p, Planet M) {  
+  return dist(p.pos, M.pos) < 2.456 * M.radius * pow((M.mass / (M.radius * M.radius * M.radius)) / (p.mass / (p.radius * p.radius * p.radius)), (1.0 / 3.0));
+}
+
 void explode(Planet p, int i) {
   int pieces = (int)random(2, 9); //possible amounts of debris
   float newMassTotal = 0;

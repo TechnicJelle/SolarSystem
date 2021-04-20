@@ -129,7 +129,7 @@ void draw() {
   //Planet physics -->
   if (!mousePressed && simRunning && !simHalted) {
     for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
-      for (int i = planets.size() - 1; i >= 0; i--) {    
+      for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
 
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS || p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
@@ -137,8 +137,8 @@ void draw() {
 
         //roche limit
         if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0)) && enableRoche) {
-          explode(p, i, planets);
-        }         
+          explode(p, i);
+        }
         p.applyForce(attractMass(p));
         
         //Planet - Planet interactions
@@ -151,8 +151,8 @@ void draw() {
 
           //Planets explode upon impact
           for (int z = planets.size() - 1; z >= 0; z--) {
-            if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {            
-              p.explode_me = true;
+            if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {
+              p.explodeMe = true;
             }
           }
         }
@@ -161,8 +161,8 @@ void draw() {
       
       while (containsExplode(planets)) {
         for (int z = planets.size() - 1; z >= 0; z--) {
-          if (planets.get(z).explode_me) {
-            explode(planets.get(z), z, planets);
+          if (planets.get(z).explodeMe) {
+            explode(planets.get(z), z);
           }
         }
       }
@@ -303,20 +303,19 @@ PVector attractMass(Planet p) {
 }
 
 boolean containsExplode(ArrayList<Planet> q) {
-  for (int z = planets.size() - 1; z >= 0; z--) {
-    if (planets.get(z).explode_me) {
+  for (int z = q.size() - 1; z >= 0; z--) {
+    if (q.get(z).explodeMe) {
       return true;
     }
   }
   return false;
 }
 
-
 PVector attractMass(Planet p, Planet o) {
   float d = dist(p.pos, o.pos);
   float m = o.mass * p.mass;
 
-  if (d > p.radius + o.radius) { 
+  if (d > p.radius + o.radius) {
     float rsq = sq(dist(o.pos, p.pos));
     float q = m/rsq;
     return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
@@ -330,11 +329,11 @@ PVector attractMass(Planet p, Planet o) {
   }
 }
 
-boolean roche(Planet p, Planet M) {  
+boolean roche(Planet p, Planet M) {
   return dist(p.pos, M.pos) < 2.456 * M.radius * pow((M.mass / (M.radius * M.radius * M.radius)) / (p.mass / (p.radius * p.radius * p.radius)), (1.0 / 3.0));
 }
 
-void explode(Planet p, int i, ArrayList<Planet> q) {
+void explode(Planet p, int i) {
   int pieces = (int)random(2, 9); //possible amounts of debris
   float newMassTotal = 0;
   float newAreaTotal = 0;
@@ -369,12 +368,12 @@ void explode(Planet p, int i, ArrayList<Planet> q) {
     float spawningLimit = p.radius - newRadii[j];
     PVector newPos = new PVector(random(-spawningLimit, spawningLimit), random(-spawningLimit, spawningLimit)).add(p.pos);
     if (newRadii[j] >= MIN_PLANET_RADIUS/2) {
-      q.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
+      planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
     }
   }
 
-  if (i < q.size()) {
-    q.remove(i);
+  if (i < planets.size()) {
+    planets.remove(i);
   }
 }
 
@@ -470,7 +469,7 @@ void keyPressed() {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
         if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
-          explode(p, i, planets);
+          explode(p, i);
         }
       }
       break;

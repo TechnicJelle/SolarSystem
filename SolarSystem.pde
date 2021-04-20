@@ -283,12 +283,17 @@ PVector attractMass(Planet p) {
 PVector attractMass(Planet p, Planet o) {
   float d = dist(p.pos, o.pos);
   float m = o.mass * p.mass;
-  float rsq = sq(dist(o.pos, p.pos));
-  float q = m/rsq;
-  if (d > p.radius + o.radius) {    
+
+  if (d > p.radius + o.radius) { 
+    float rsq = sq(dist(o.pos, p.pos));
+    float q = m/rsq;
     return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
-  } else {
+  } else if (d > 2.0 * (p.radius + o.radius) / 3.0) {
     return new PVector(0, 0);
+  } else {
+    float rsq = sq(sq(dist(o.pos, p.pos)));
+    float q = m/rsq;
+    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * -q);
   }
 }
 

@@ -145,7 +145,7 @@ void draw() {
 
         //Planets explode upon impact
         for (int z = planets.size() - 1; z >= 0; z--) {
-          if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2) {            
+          if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {            
             p.explode_me = true;
           }
         }       

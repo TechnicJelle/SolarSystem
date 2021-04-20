@@ -35,6 +35,10 @@ float wd3;
 float colSegWidth;
 float wd3csw;
 
+boolean enableRoche = true;
+boolean enablePhysics = true;
+
+
 boolean simHalted = false;
 
 final int alternateButton = SHIFT; //could also use ALT, because alternate
@@ -132,25 +136,29 @@ void draw() {
           planets.remove(i);
 
         //roche limit
-        if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0))) {
+        if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0)) && enableRoche) {
           explode(p, i, planets);
         }         
         p.applyForce(attractMass(p));
+        
+        //Planet - Planet interactions
+        if (enablePhysics) {
+          for (int z = planets.size() - 1; z >= 0; z--) {
+            if (z != i) {
+              p.applyForce(attractMass(p, planets.get(z)));
+            }
+          }
 
-        for (int z = planets.size() - 1; z >= 0; z--) {
-          if (z != i) {
-            p.applyForce(attractMass(p, planets.get(z)));
+          //Planets explode upon impact
+          for (int z = planets.size() - 1; z >= 0; z--) {
+            if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {            
+              p.explode_me = true;
+            }
           }
         }
-
-        //Planets explode upon impact
-        for (int z = planets.size() - 1; z >= 0; z--) {
-          if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {            
-            p.explode_me = true;
-          }
-        }       
         p.update(1/float(TIMESTEPS_PER_FRAME));
       }
+      
       while (containsExplode(planets)) {
         for (int z = planets.size() - 1; z >= 0; z--) {
           if (planets.get(z).explode_me) {
@@ -439,6 +447,14 @@ void keyPressed() {
           planets.remove(i);
         }
       }
+      break;
+    case 'f':
+    case 'F':
+      enablePhysics = !enablePhysics;
+      break;
+    case 'r':
+    case 'R':
+      enableRoche = !enableRoche;
       break;
     case 'z': //remove offscreen planets
     case 'Z':

@@ -5,6 +5,8 @@ A simple solar system simulation environment where you can play around with plan
 
 ## [Click here to download!](../../releases/latest)
 
+![Planet impact destruction!](/.github/images/pc_anim4_planetimpact.gif "GIF")\
+*Planet impact destruction!*
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\

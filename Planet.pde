@@ -10,7 +10,8 @@ class Planet {
   color col;
 
   boolean onScreen = true;
-
+  boolean explodeMe = false;
+  
   Planet(PVector p, PVector v, float m, float r, color c) {
     pos = p;
     vel = v;

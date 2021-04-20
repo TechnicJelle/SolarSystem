@@ -35,6 +35,10 @@ float wd3;
 float colSegWidth;
 float wd3csw;
 
+boolean enableRoche = true;
+boolean enablePtPPhysics = true;
+
+
 boolean simHalted = false;
 
 final int alternateButton = SHIFT; //could also use ALT, because alternate
@@ -128,16 +132,39 @@ void draw() {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
 
-        if (dist(p.pos, sun) < p.radius + SUN_RADIUS ||
-          p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
+        if (dist(p.pos, sun) < p.radius + SUN_RADIUS || p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
-        //updated roche limit
-        if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0))) {
+        //roche limit
+        if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0)) && enableRoche) {
           explode(p, i);
-        }       
+        }
         p.applyForce(attractMass(p));
+        
+        //Planet - Planet interactions
+        if (enablePtPPhysics) {
+          for (int z = planets.size() - 1; z >= 0; z--) {
+            if (z != i) {
+              p.applyForce(attractMass(p, planets.get(z)));
+            }
+          }
+
+          //Planets explode upon impact
+          for (int z = planets.size() - 1; z >= 0; z--) {
+            if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2 && degrees(PVector.angleBetween(planets.get(z).vel, p.vel)) > 10 && p.mass < 10 * planets.get(z).mass && p.radius < 10 * planets.get(z).radius) {
+              p.explodeMe = true;
+            }
+          }
+        }
         p.update(1/float(TIMESTEPS_PER_FRAME));
+      }
+      
+      while (containsExplode(planets)) {
+        for (int z = planets.size() - 1; z >= 0; z--) {
+          if (planets.get(z).explodeMe) {
+            explode(planets.get(z), z);
+          }
+        }
       }
     }
   }
@@ -275,6 +302,37 @@ PVector attractMass(Planet p) {
   return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
 }
 
+boolean containsExplode(ArrayList<Planet> q) {
+  for (int z = q.size() - 1; z >= 0; z--) {
+    if (q.get(z).explodeMe) {
+      return true;
+    }
+  }
+  return false;
+}
+
+PVector attractMass(Planet p, Planet o) {
+  float d = dist(p.pos, o.pos);
+  float m = o.mass * p.mass;
+
+  if (d > p.radius + o.radius) {
+    float rsq = sq(dist(o.pos, p.pos));
+    float q = m/rsq;
+    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * q);
+  } else if (d > 2.0 * (p.radius + o.radius) / 3.0) {
+    return new PVector(0, 0);
+  } else {
+    //float rsq = sq(sq(dist(o.pos, p.pos)));
+    //float q = m/rsq; 
+    float q = 0;
+    return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * -q);
+  }
+}
+
+boolean roche(Planet p, Planet M) {
+  return dist(p.pos, M.pos) < 2.456 * M.radius * pow((M.mass / (M.radius * M.radius * M.radius)) / (p.mass / (p.radius * p.radius * p.radius)), (1.0 / 3.0));
+}
+
 void explode(Planet p, int i) {
   int pieces = (int)random(2, 9); //possible amounts of debris
   float newMassTotal = 0;
@@ -301,7 +359,7 @@ void explode(Planet p, int i) {
     totalError.sub(newVels[j]);
     newVels[j].div(newMasses[j]);
   }
-  
+
   for (int j=0; j < pieces; j++) {
     newVels[j].sub(PVector.div(totalError, newMasses[j] * (pieces + 1)));
   }
@@ -313,10 +371,13 @@ void explode(Planet p, int i) {
       planets.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
     }
   }
-  if(i < planets.size()) {
+
+  if (i < planets.size()) {
     planets.remove(i);
   }
 }
+
+
 
 void updateNewPlanetColour() {
   newPlanetColour = colourFromMass(newPlanetHue, newPlanetMass);
@@ -385,6 +446,14 @@ void keyPressed() {
           planets.remove(i);
         }
       }
+      break;
+    case 'f':
+    case 'F':
+      enablePtPPhysics = !enablePtPPhysics;
+      break;
+    case 'r':
+    case 'R':
+      enableRoche = !enableRoche;
       break;
     case 'z': //remove offscreen planets
     case 'Z':

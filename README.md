@@ -5,8 +5,8 @@ A simple solar system simulation environment where you can play around with plan
 
 ## [Click here to download!](../../releases/latest)
 
-![GIF](/.github/images/pc_anim3-destruction.gif "GIF")
-*Latest Update: Planet Destruction!*
+![Planet impact destruction!](/.github/images/pc_anim4_planetimpact.gif "GIF")\
+*Planet impact destruction!*
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
@@ -23,6 +23,8 @@ A simple solar system simulation environment where you can play around with plan
 `H` Turn Heading Line On/**Off**\
 `P` Turn Planet Properties Text On/**Off**\
 `U` Turn all UI **On**/Off\
+`F` Turn Planet - Planet interaction and destruction upon impact **On**/Off\
+`R` Turn rochelimit **On**/Off\
 `Q` **High**/Low Quality Trails\
 `D` Destroy a Planet (Split it into multiple pieces)\
 `X` Remove a Planet (Hover over it with your cursor)\
@@ -35,6 +37,8 @@ A simple solar system simulation environment where you can play around with plan
 ![Default Settings](/.github/images/pc_def.png "Default Settings")\
 *Default Settings*
 
+![GIF](/.github/images/pc_anim3-destruction.gif "GIF")\
+*Planet Destruction!*
 
 ![Now with Mass! A screenshot](/.github/images/pc_samehue.png "Now with Mass! A screenshot")\
 *Now with Mass! These three planets all have the same hue, but due to their difference in mass, their colour is different*

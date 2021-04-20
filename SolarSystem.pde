@@ -141,9 +141,23 @@ void draw() {
           if (z != i) {
             p.applyForce(attractMass(p, planets.get(z)));
           }
-        }        
+        }
+
+        //Planets explode upon impact
+        for (int z = planets.size() - 1; z >= 0; z--) {
+          if (z != i && dist(p.pos, planets.get(z).pos) < (p.radius + planets.get(z).radius) / 2) {            
+            p.explode_me = true;
+          }
+        }       
         p.update(1/float(TIMESTEPS_PER_FRAME));
-      }      
+      }
+      while (containsExplode(planets)) {
+        for (int z = planets.size() - 1; z >= 0; z--) {
+          if (planets.get(z).explode_me) {
+            explode(planets.get(z), z, planets);
+          }
+        }
+      }
     }
   }
 
@@ -280,6 +294,16 @@ PVector attractMass(Planet p) {
   return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
 }
 
+boolean containsExplode(ArrayList<Planet> q) {
+  for (int z = planets.size() - 1; z >= 0; z--) {
+    if (planets.get(z).explode_me) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
 PVector attractMass(Planet p, Planet o) {
   float d = dist(p.pos, o.pos);
   float m = o.mass * p.mass;
@@ -291,8 +315,9 @@ PVector attractMass(Planet p, Planet o) {
   } else if (d > 2.0 * (p.radius + o.radius) / 3.0) {
     return new PVector(0, 0);
   } else {
-    float rsq = sq(sq(dist(o.pos, p.pos)));
-    float q = m/rsq;
+    //float rsq = sq(sq(dist(o.pos, p.pos)));
+    //float q = m/rsq; 
+    float q = 0;
     return PVector.sub(o.pos, p.pos).normalize().mult(FAC_GRAV * -q);
   }
 }
@@ -339,7 +364,7 @@ void explode(Planet p, int i, ArrayList<Planet> q) {
       q.add(new Planet(newPos, newVel, newMasses[j], newRadii[j], colourFromMass(hue(p.col), newMasses[j])));
     }
   }
-  
+
   if (i < q.size()) {
     q.remove(i);
   }

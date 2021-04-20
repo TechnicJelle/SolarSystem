@@ -35,7 +35,7 @@ A simple solar system simulation environment where you can play around with plan
 ![Default Settings](/.github/images/pc_def.png "Default Settings")\
 *Default Settings*
 
-![GIF](/.github/images/pc_anim3-destruction.gif "GIF")
+![GIF](/.github/images/pc_anim3-destruction.gif "GIF")\
 *Planet Destruction!*
 
 ![Now with Mass! A screenshot](/.github/images/pc_samehue.png "Now with Mass! A screenshot")\

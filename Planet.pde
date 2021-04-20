@@ -10,7 +10,7 @@ class Planet {
   color col;
 
   boolean onScreen = true;
-  boolean explode_me;
+  boolean explodeMe = false;
   
   Planet(PVector p, PVector v, float m, float r, color c) {
     pos = p;
@@ -19,7 +19,6 @@ class Planet {
     mass = m;
     radius = r;
     col = c;
-    explode_me = false;
     trail = new ArrayList<PVector>();
     for (int i = 0; i < TRAIL_LENGTH; i++) {
       trail.add(pos.copy());
@@ -30,7 +29,7 @@ class Planet {
     f.div(mass); //Do take the mass into account in F = m * a  ==>  a = F / m
     acc.add(f);
   }
-      
+
   void update(float fac) {
     //Newtonian Physics Calculation -->
     vel.add(PVector.mult(acc, fac));

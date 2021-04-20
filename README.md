@@ -5,8 +5,6 @@ A simple solar system simulation environment where you can play around with plan
 
 ## [Click here to download!](../../releases/latest)
 
-![GIF](/.github/images/pc_anim3-destruction.gif "GIF")
-*Latest Update: Planet Destruction!*
 
 ## Controls
 `Left Click (Drag)` Spawn a new Planet\
@@ -26,6 +24,8 @@ A simple solar system simulation environment where you can play around with plan
 `Q` **High**/Low Quality Trails\
 `D` Destroy a Planet (Split it into multiple pieces)\
 `X` Remove a Planet (Hover over it with your cursor)\
+`F` Toggle Planet - Planet interaction and destruction upon impact\
+`R` Toggle rochelimit\
 `Z` Remove all offscreen Planets\
 `S` Save Screenshot (will be saved in a screenshots folder next to the executable as *YYYYMMDD_hhmmss.png*)\
 `Shift` + `S` Save Screenshot with all Gizmos visible\
@@ -35,6 +35,8 @@ A simple solar system simulation environment where you can play around with plan
 ![Default Settings](/.github/images/pc_def.png "Default Settings")\
 *Default Settings*
 
+![GIF](/.github/images/pc_anim3-destruction.gif "GIF")
+*Planet Destruction!*
 
 ![Now with Mass! A screenshot](/.github/images/pc_samehue.png "Now with Mass! A screenshot")\
 *Now with Mass! These three planets all have the same hue, but due to their difference in mass, their colour is different*

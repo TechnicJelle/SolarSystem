@@ -36,7 +36,7 @@ float colSegWidth;
 float wd3csw;
 
 boolean enableRoche = true;
-boolean enablePhysics = true;
+boolean enablePtPPhysics = true;
 
 
 boolean simHalted = false;
@@ -142,7 +142,7 @@ void draw() {
         p.applyForce(attractMass(p));
         
         //Planet - Planet interactions
-        if (enablePhysics) {
+        if (enablePtPPhysics) {
           for (int z = planets.size() - 1; z >= 0; z--) {
             if (z != i) {
               p.applyForce(attractMass(p, planets.get(z)));
@@ -450,7 +450,7 @@ void keyPressed() {
       break;
     case 'f':
     case 'F':
-      enablePhysics = !enablePhysics;
+      enablePtPPhysics = !enablePtPPhysics;
       break;
     case 'r':
     case 'R':

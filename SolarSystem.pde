@@ -2,7 +2,7 @@ ArrayList<Planet> planets;
 
 PVector sun;
 final float SUN_RADIUS = 64;
-final float SUN_MASS = 500;
+final float SUN_MASS = 1500;
 
 final float MIN_PLANET_RADIUS = 8;
 final float MAX_PLANET_RADIUS = SUN_RADIUS * 2/3;
@@ -37,7 +37,7 @@ float wd3csw;
 
 boolean enableRoche = true;
 boolean enablePtPPhysics = true;
-
+boolean enableSOI = false;
 
 boolean simHalted = false;
 
@@ -131,7 +131,8 @@ void draw() {
     for (int t = 0; t < TIMESTEPS_PER_FRAME * facSimSpeedMod; t++) {
       for (int i = planets.size() - 1; i >= 0; i--) {
         Planet p = planets.get(i);
-
+        
+        //Remove planets out of screen with v > escape velocity
         if (dist(p.pos, sun) < p.radius + SUN_RADIUS || p.vel.mag() >= sqrt(2 * FAC_GRAV * SUN_MASS / PVector.sub(sun, p.pos).mag()) && !p.onScreen)
           planets.remove(i);
 
@@ -139,12 +140,24 @@ void draw() {
         if (dist(p.pos, sun) < 2.456 * SUN_RADIUS * pow((SUN_MASS * p.radius * p.radius * p.radius) / (p.mass * SUN_RADIUS * SUN_RADIUS * SUN_RADIUS), (1.0 / 3.0)) && enableRoche) {
           explode(p, i);
         }
-        p.applyForce(attractMass(p));
+               
+        if (!enableSOI & !enablePtPPhysics) {
+          p.applyForce(attractMass(p));          
+        } else if (enableSOI){ //Sphere of Influence based physics
+          int SOIindex = SOIbody(p);
+          if (SOIindex == -1 || SOIindex == i) {
+            p.applyForce(attractMass(p));
+          } else {
+            p.applyForce(attractMass(p, planets.get(SOIindex))); //force based on p2p
+            p.applyForce(attractSun(p, planets.get(SOIindex))); //force to compensate relative motion of main body
+          }
+        }
         
         //Planet - Planet interactions
         if (enablePtPPhysics) {
+          p.applyForce(attractMass(p));
           for (int z = planets.size() - 1; z >= 0; z--) {
-            if (z != i) {
+            if (z != i) {   
               p.applyForce(attractMass(p, planets.get(z)));
             }
           }
@@ -284,6 +297,9 @@ void draw() {
   image(system, 0, 0);
   if (showUI)
     image(gizmos, 0, 0);
+  
+  //3-body sphere of influence debug overlay  
+  // SOIoverlay();  
 }
 
 PVector attract(Planet p) {
@@ -293,6 +309,14 @@ PVector attract(Planet p) {
   float s = FAC_GRAV / (d*d);
   f.mult(s);
   return f;
+}
+
+//Force based on planet Q, but applied to P using P's mass
+PVector attractSun(Planet p, Planet Q){
+  float m = SUN_MASS * p.mass;
+  float rsq = sq(dist(sun, Q.pos));
+  float q = m/rsq;
+  return PVector.sub(sun, p.pos).normalize().mult(FAC_GRAV * q);
 }
 
 PVector attractMass(Planet p) {
@@ -377,8 +401,6 @@ void explode(Planet p, int i) {
   }
 }
 
-
-
 void updateNewPlanetColour() {
   newPlanetColour = colourFromMass(newPlanetHue, newPlanetMass);
 }
@@ -405,7 +427,7 @@ void keyPressed() {
     case '+':
       if (alternateAction)
         facSimSpeedMod = constrain(facSimSpeedMod + 0.1, 0.1, 5);
-      else
+      else        
         facSimSpeedMod = constrain(facSimSpeedMod + 0.5, 0.5, 5);
       break;
     case '-':
@@ -449,7 +471,23 @@ void keyPressed() {
       break;
     case 'f':
     case 'F':
-      enablePtPPhysics = !enablePtPPhysics;
+      if(enablePtPPhysics){
+        enablePtPPhysics = !enablePtPPhysics;
+        enableSOI = !enableSOI;
+      } else if(enableSOI) {
+        enableSOI = !enableSOI;
+      } else {
+        enablePtPPhysics = !enablePtPPhysics;
+      }
+      break;
+    case 'k':
+    case 'K':
+    for (int i = planets.size() - 1; i >= 0; i--) {
+        Planet p = planets.get(i);
+        if (dist(mouseX, mouseY, p.pos.x, p.pos.y) < p.radius) {
+          setKeplerOrbit(planets.get(i));
+        }
+      }
       break;
     case 'r':
     case 'R':
@@ -501,4 +539,94 @@ void keyReleased() {
 
 float dist(PVector v1, PVector v2) {
   return dist(v1.x, v1.y, v2.x, v2.y);
+}
+
+//Gravitational force
+float F_energy(float x, float y, Planet P) { 
+  return FAC_GRAV * P.mass / distance(x, y, P);
+}
+
+//influence of P on Q
+float F_energy(Planet Q, Planet P) { 
+  return FAC_GRAV * P.mass / (dist(P.pos, Q.pos) * dist(P.pos, Q.pos));
+}
+
+//square of the distance between x,y and p
+float distance(float x, float y, Planet P) {
+  return (x - P.pos.x) * (x - P.pos.x) + (y - P.pos.y) * (y - P.pos.y);
+}
+
+//Find body with most influence on P
+int SOIbody(Planet P) {
+  int index = 0;
+  float largest = -1;
+  if (planets.size() > 1) {
+    for (int i = 0; i < planets.size(); i++){
+      if (F_energy(P, planets.get(i)) > largest){
+        if (planets.get(i) != P){ 
+          largest = F_energy(P, planets.get(i));
+          index = i;
+        }
+      }
+    }
+  }
+  if (FAC_GRAV * SUN_MASS / ((P.pos.x-width/2) * (P.pos.x-width/2) + (P.pos.y-height/2) * (P.pos.y-height/2)) > largest){
+    return -1; 
+  } else {
+    return index;
+  }
+}
+
+//SOI debug overlay
+void SOIoverlay() {  
+  float step = 3; //overlay density
+  if (planets.size() > 1) {
+    for (int i = 0; i < width; i += step) {
+      for (int j = 0; j < height; j += step) {
+        float S_energy = FAC_GRAV * SUN_MASS / ((i-width/2) * (i-width/2) + (j-height/2) * (j-height/2));
+        if (F_energy(i, j, planets.get(1)) >= F_energy(i, j, planets.get(0)) && F_energy(i, j, planets.get(1)) > S_energy) {
+          set(i, j, color(255, 255, 255));
+        } else if (F_energy(i, j, planets.get(0)) >= F_energy(i, j, planets.get(1)) && F_energy(i, j, planets.get(0)) > S_energy) {
+          set(i, j, color(150, 255, 255));
+        } else {
+          set(i, j, color(50, 255, 255));
+        }
+      }
+    }
+  }
+}
+
+//Kerlerian circle orbit around body with most influence
+void setKeplerOrbit(Planet P){
+  int index = SOIbody(P);
+  float velocity;
+  float angle;
+  
+  if (index == -1){
+    velocity = sqrt(FAC_GRAV * SUN_MASS / sqrt(distance(width/2, height/2, P)));
+    angle = PI - atan((P.pos.y-height/2) / (P.pos.x-width/2));
+  
+    if (P.pos.x > width/2 && P.pos.y > height/2){
+      angle += PI;
+    } else if(P.pos.x > width/2 && P.pos.y < height/2) {
+      angle -= PI;  
+    }
+  } else {
+    velocity = sqrt(FAC_GRAV * planets.get(index).mass / dist(P.pos, planets.get(index).pos));
+    angle = PI - atan((P.pos.y - planets.get(index).pos.y) / (P.pos.x - planets.get(index).pos.x));
+    
+    if (P.pos.x > planets.get(index).pos.x && P.pos.y > planets.get(index).pos.y){
+      angle += PI;
+    } else if(P.pos.x > planets.get(index).pos.x && P.pos.y < planets.get(index).pos.y) {
+      angle -= PI;  
+    }
+  }
+  
+  PVector v = new PVector(-sin(angle) * velocity, -cos(angle) * velocity);
+  
+  if(index == -1){
+    P.vel = v;
+  } else {  
+    P.vel = v.add(planets.get(index).vel);
+  }
 }
